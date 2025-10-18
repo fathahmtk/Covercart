@@ -251,7 +251,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
             )}
             
             {/* Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
                     <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-4 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Decrease quantity" disabled={isOutOfStock}>
                         <MinusIcon className="w-4 h-4" />

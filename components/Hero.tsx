@@ -1,27 +1,28 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
+import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
+import { ChevronRightIcon } from './icons/ChevronRightIcon';
 
 const heroImages = [
   {
-    id: '1614214211420-565b8a07b713',
-    alt: 'A phone with a stylish pastel geometric case placed on a pink surface'
+    id: '1604076913837-52ab5629fba9',
+    alt: 'A phone case with a sleek, dark, abstract textured design.'
   },
   {
-    id: '1596723298623-7a7625103a49',
-    alt: 'A phone with an elegant black and silver marble case'
+    id: '1512499617640-b74ae3e7db25',
+    alt: 'A stylish flat lay with a phone in a case, sunglasses, and notebook on a pink background.'
+  },
+  {
+    id: '1610792516307-ea5acd9c3b00',
+    alt: 'A person holding a phone with a modern, artistic case against a textured wall.'
+  },
+  {
+    id: '1598327105553-6939ef417205',
+    alt: 'A phone with an elegant case on a minimalist desk with a keyboard and plant.'
   },
   {
     id: '1579546929518-9e396f3cc809',
-    alt: 'A vibrant and colorful gradient phone case design'
-  },
-  {
-    id: '1620421680383-3052a353351d',
-    alt: 'A phone case with a sharp geometric prism design in bright colors'
-  },
-  {
-    id: '1557672172-298e090bd0f1',
-    alt: 'A phone case with a retro synthwave sunset design'
+    alt: 'A vibrant and colorful abstract gradient phone case design.'
   }
 ];
 
@@ -32,53 +33,79 @@ const generateSrcSet = (id: string) => {
   return widths.map(w => `${baseUrl}?${params}&w=${w} ${w}w`).join(', ');
 };
 
-
 const Hero: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  // FIX: Replaced NodeJS.Timeout with ReturnType<typeof setTimeout> for browser compatibility.
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const AUTOPLAY_DELAY = 5000;
+
+  const resetTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  };
+
+  const goToNext = useCallback(() => {
+    setCurrentImageIndex(prevIndex => (prevIndex + 1) % heroImages.length);
+  }, []);
+
+  const goToPrev = () => {
+    setCurrentImageIndex(prevIndex => (prevIndex - 1 + heroImages.length) % heroImages.length);
+  };
+  
+  const goToSlide = (slideIndex: number) => {
+    setCurrentImageIndex(slideIndex);
+  }
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 5000); // Change image every 5 seconds
-
-    return () => clearInterval(timer);
-  }, []);
+    resetTimeout();
+    timeoutRef.current = setTimeout(goToNext, AUTOPLAY_DELAY);
+    return () => resetTimeout();
+  }, [currentImageIndex, goToNext]);
 
   return (
     <section 
-      className="relative h-screen text-white flex items-center justify-center overflow-hidden"
-      aria-label="Hero section with a stylish model"
+      className="relative h-screen text-white flex items-center justify-center overflow-hidden group"
+      aria-roledescription="carousel"
+      aria-label="Hero section with stylish phone cases"
     >
-      <div className="absolute inset-0 z-0">
+      <div 
+        className="absolute inset-0 z-0 flex transition-transform duration-700 ease-in-out"
+        style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+      >
          {heroImages.map((image, index) => {
-            const srcSet = generateSrcSet(image.id);
             const defaultSrc = `https://images.unsplash.com/photo-${image.id}?q=80&auto=format&fit=crop&w=1920`;
-
             return (
-              <img 
-                  key={image.id}
-                  src={defaultSrc}
-                  srcSet={srcSet}
-                  sizes="100vw"
-                  alt={image.alt}
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  // @ts-ignore
-                  fetchPriority={index === 0 ? 'high' : 'auto'}
-                  className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ease-in-out ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}
-              />
+              <div
+                key={image.id}
+                className="relative w-full h-full flex-shrink-0"
+                aria-hidden={index !== currentImageIndex}
+                aria-roledescription="slide"
+              >
+                  <img 
+                      src={defaultSrc}
+                      srcSet={generateSrcSet(image.id)}
+                      sizes="100vw"
+                      alt={image.alt}
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      // @ts-ignore
+                      fetchPriority={index === 0 ? 'high' : 'auto'}
+                      className="w-full h-full object-cover object-center animate-ken-burns"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" aria-hidden="true"></div>
+              </div>
             );
          })}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" aria-hidden="true"></div>
       </div>
       
       <div className="relative z-10 container mx-auto px-6 text-center">
         <div className="opacity-0 animate-slide-in-bottom" style={{ animationDelay: '0.2s' }}>
-            <h1 className="text-4xl md:text-7xl font-extrabold leading-tight mb-4 drop-shadow-2xl tracking-tight">
+            <h1 className="text-4xl md:text-7xl font-extrabold leading-tight mb-4 drop-shadow-lg tracking-tight">
               Style That Speaks.
             </h1>
         </div>
         <div className="opacity-0 animate-slide-in-bottom" style={{ animationDelay: '0.5s' }}>
-            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto drop-shadow-lg font-light text-gray-200">
+            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto drop-shadow-md font-light text-gray-200">
               From runway trends to timeless classics, find the perfect case that's uniquely you.
             </p>
         </div>
@@ -91,8 +118,37 @@ const Hero: React.FC = () => {
           </a>
         </div>
       </div>
+      
+      {/* Navigation Arrows */}
+      <button 
+        onClick={goToPrev}
+        className="absolute top-1/2 left-4 md:left-8 -translate-y-1/2 z-20 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all opacity-0 group-hover:opacity-100"
+        aria-label="Previous slide"
+      >
+        <ChevronLeftIcon className="w-6 h-6 md:w-8 md:h-8" />
+      </button>
+      <button 
+        onClick={goToNext}
+        className="absolute top-1/2 right-4 md:right-8 -translate-y-1/2 z-20 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all opacity-0 group-hover:opacity-100"
+        aria-label="Next slide"
+      >
+        <ChevronRightIcon className="w-6 h-6 md:w-8 md:h-8" />
+      </button>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
+      {/* Pagination Dots */}
+      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-20 flex space-x-3">
+        {heroImages.map((_, index) => (
+          <button 
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${currentImageIndex === index ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`}
+            aria-label={`Go to slide ${index + 1}`}
+            aria-current={index === currentImageIndex}
+          />
+        ))}
+      </div>
+
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
         <a href="#products" aria-label="Scroll down to products">
            <ChevronDownIcon className="w-8 h-8 text-white/70 animate-bounce-slow" />
         </a>

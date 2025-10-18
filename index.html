@@ -155,6 +155,18 @@
   .animate-bounce-slow {
     animation: bounce 2.5s infinite;
   }
+
+  @keyframes ken-burns-in {
+    from {
+      transform: scale(1.15) rotate(1deg);
+    }
+    to {
+      transform: scale(1) rotate(0deg);
+    }
+  }
+  .animate-ken-burns {
+      animation: ken-burns-in 7s ease-out forwards;
+  }
 </style>
 </head>
 <body class="bg-white dark:bg-gray-950">

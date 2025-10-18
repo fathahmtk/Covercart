@@ -6,6 +6,7 @@ import { fileToBase64 } from '../utils/imageUtils';
 import { XMarkIcon } from './icons/XMarkIcon';
 import { PhotographIcon } from './icons/PhotographIcon';
 import { XCircleIcon } from './icons/XCircleIcon';
+import { PlusIcon } from './icons/PlusIcon';
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -101,8 +102,8 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
       setError('Please fill all required fields and upload a main image.');
       return;
     }
-    if (variants.some(v => !v.name || !v.imageUrl || v.stock === undefined)) {
-        setError('Please ensure all variants have a name, an image, and a stock quantity.');
+    if (variants.some(v => !v.name || !v.imageUrl || v.stock === undefined || v.stock < 0)) {
+        setError('Please ensure all variants have a name, an image, and a valid stock quantity.');
         return;
     }
     setError('');
@@ -112,8 +113,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
         price: parseFloat(price),
         description,
         category,
-        // FIX: Added missing 'brand' property to satisfy the Product type.
-        // Based on existing data, brand is the same as category.
         brand: category,
         imageUrl: mainImage,
         isFeatured,
@@ -140,9 +139,9 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-60 z-50" onClick={handleClose} />
+      <div className="fixed inset-0 bg-black bg-opacity-60 z-50 animate-fade-in" onClick={handleClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-modal-zoom-in">
           <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white">{productToEdit ? 'Edit Product' : 'Add New Product'}</h2>
             <button onClick={handleClose} className="text-gray-500 hover:text-gray-800 dark:hover:text-white">
@@ -157,7 +156,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
               </div>
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (₹)</label>
-                <input type="number" id="price" value={price} onChange={e => setPrice(e.target.value)} className="mt-1 input-style" required />
+                <input type="number" id="price" value={price} onChange={e => setPrice(e.target.value)} className="mt-1 input-style" required min="0" />
               </div>
             </div>
             <div>
@@ -186,42 +185,59 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
               {variants.length === 0 && (
                 <div>
                   <label htmlFor="stock" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock Quantity</label>
-                  <input type="number" id="stock" value={stock} onChange={e => setStock(e.target.value)} className="mt-1 input-style" required />
+                  <input type="number" id="stock" value={stock} onChange={e => setStock(e.target.value)} className="mt-1 input-style" required min="0" />
                 </div>
               )}
             </div>
              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Main Image</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Main Image</label>
                 <ImageUploader image={mainImage} onUpload={e => handleImageUpload(e)} id="main-image-upload" />
               </div>
             <div className="space-y-4 pt-4 border-t dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Variants</h3>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Product Variants</h3>
               {variants.map((variant, index) => (
-                <div key={index} className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-md space-y-3 relative">
-                  <button type="button" onClick={() => handleRemoveVariant(index)} className="absolute -top-2 -right-2 text-gray-400 hover:text-red-500"><XCircleIcon /></button>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input type="text" placeholder="Variant Name" value={variant.name} onChange={e => handleVariantChange(index, 'name', e.target.value)} className="input-style md:col-span-2" required />
-                    <input type="number" placeholder="Stock" value={variant.stock} onChange={e => handleVariantChange(index, 'stock', parseInt(e.target.value, 10) || 0)} className="input-style" required />
-                  </div>
-                   <div className="flex items-center gap-2">
-                       <input type="color" value={variant.colorCode} onChange={e => handleVariantChange(index, 'colorCode', e.target.value)} className="h-10 w-12 p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer" />
-                       <span className="text-sm text-gray-500 dark:text-gray-400">Variant Color</span>
+                <div key={index} className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-md relative border dark:border-gray-600/50">
+                    <button type="button" onClick={() => handleRemoveVariant(index)} className="absolute -top-2.5 -right-2.5 bg-white dark:bg-gray-700 rounded-full text-gray-500 hover:text-red-500 z-10 transition-transform hover:scale-110">
+                        <XCircleIcon />
+                    </button>
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <div className="md:w-1/3">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Variant Image</label>
+                            <ImageUploader image={variant.imageUrl ?? null} onUpload={e => handleImageUpload(e, index)} id={`variant-image-${index}`} />
+                        </div>
+                        <div className="md:w-2/3 space-y-4">
+                            <div>
+                                <label htmlFor={`variant-name-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">Variant Name</label>
+                                <input id={`variant-name-${index}`} type="text" placeholder="e.g., Midnight Black" value={variant.name || ''} onChange={e => handleVariantChange(index, 'name', e.target.value)} className="input-style mt-1" required />
+                            </div>
+                            <div className="flex items-end gap-4">
+                                <div className="flex-grow">
+                                    <label htmlFor={`variant-stock-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock</label>
+                                    <input id={`variant-stock-${index}`} type="number" placeholder="0" value={variant.stock ?? ''} onChange={e => handleVariantChange(index, 'stock', parseInt(e.target.value, 10) || 0)} className="input-style mt-1" required min="0" />
+                                </div>
+                                <div>
+                                    <label htmlFor={`variant-color-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-center">Color</label>
+                                    <input id={`variant-color-${index}`} type="color" value={variant.colorCode} onChange={e => handleVariantChange(index, 'colorCode', e.target.value)} className="h-10 w-16 p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer mt-1" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  <ImageUploader image={variant.imageUrl ?? null} onUpload={e => handleImageUpload(e, index)} id={`variant-image-${index}`} />
                 </div>
               ))}
-              <button type="button" onClick={handleAddVariant} className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline">+ Add Variant</button>
+              <button type="button" onClick={handleAddVariant} className="flex items-center gap-2 text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline">
+                <PlusIcon className="w-4 h-4" /> Add Variant
+              </button>
             </div>
-            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+            {error && <p className="text-red-500 text-sm text-center font-medium bg-red-50 dark:bg-red-900/50 p-3 rounded-md">{error}</p>}
             <div className="pt-4 border-t dark:border-gray-700 flex justify-end gap-3">
-              <button type="button" onClick={handleClose} className="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
-              <button type="submit" className="px-4 py-2 rounded-md bg-teal-600 text-white hover:bg-teal-700">Save Product</button>
+              <button type="button" onClick={handleClose} className="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 font-semibold">Cancel</button>
+              <button type="submit" className="px-6 py-2 rounded-md bg-teal-600 text-white hover:bg-teal-700 font-semibold">Save Product</button>
             </div>
           </form>
         </div>
       </div>
        <style>{`
-          .input-style { display: block; width: 100%; border-radius: 0.375rem; border: 1px solid; border-color: #D1D5DB; background-color: #FFFFFF; padding: 0.5rem 0.75rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+          .input-style { display: block; width: 100%; border-radius: 0.375rem; border: 1px solid; border-color: #D1D5DB; background-color: #FFFFFF; padding: 0.5rem 0.75rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: border-color 0.2s, box-shadow 0.2s; }
           .dark .input-style { border-color: #4B5563; background-color: #374151; color: #F3F4F6; }
           .input-style:focus { outline: 2px solid transparent; outline-offset: 2px; --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000); border-color: #14B8A6; --tw-ring-color: #14B8A6; }
        `}</style>
@@ -231,13 +247,13 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
 
 const ImageUploader: React.FC<{image: string | null, onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void, id: string}> = ({ image, onUpload, id }) => (
   <div>
-    <label htmlFor={id} className="cursor-pointer">
+    <label htmlFor={id} className="cursor-pointer group">
       {image ? (
         <img src={image} alt="Upload preview" className="w-full h-32 object-contain rounded-md bg-gray-100 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-500"/>
       ) : (
-        <div className="w-full h-32 flex flex-col items-center justify-center rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-300 dark:border-gray-500 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
+        <div className="w-full h-32 flex flex-col items-center justify-center rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-300 dark:border-gray-500 text-gray-500 group-hover:bg-gray-100 dark:group-hover:bg-gray-800 group-hover:border-teal-500 transition-colors">
           <PhotographIcon />
-          <p className="text-sm mt-1">Click to upload image</p>
+          <p className="text-sm mt-1">Click to upload</p>
         </div>
       )}
     </label>

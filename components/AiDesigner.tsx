@@ -35,7 +35,7 @@ const AiDesigner: React.FC = () => {
 
   const PhoneFrame: React.FC<{ model: PhoneModel; children: React.ReactNode }> = ({ model, children }) => {
     // Base classes for the phone's outer chassis
-    let frameClasses = "relative w-48 h-96 bg-gray-800 dark:bg-gray-900 shadow-2xl transition-all duration-300 flex items-center justify-center p-1.5";
+    let frameClasses = "relative w-44 h-88 sm:w-48 sm:h-96 bg-gray-800 dark:bg-gray-900 shadow-2xl transition-all duration-300 flex items-center justify-center p-1.5";
     let screenClasses = "relative w-full h-full bg-black overflow-hidden flex items-center justify-center shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)]";
     let cameraCutout = null;
     let sideButtons = null;

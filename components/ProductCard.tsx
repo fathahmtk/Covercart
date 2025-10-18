@@ -78,20 +78,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
             Out of Stock
           </div>
         )}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute top-3 right-3 flex flex-col gap-2 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button 
             onClick={handleWishlistToggle} 
             className={`p-2.5 rounded-full backdrop-blur-sm transition-colors ${isInWishlist ? 'bg-red-500/80 text-white' : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-200 hover:bg-red-500 hover:text-white'}`}
             aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+            title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
           >
             <HeartIcon filled={isInWishlist} />
-          </button>
-          <button 
-            onClick={handleQuickView} 
-            className="p-2.5 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 hover:bg-teal-500 hover:text-white transition-colors"
-            aria-label="Quick view"
-          >
-            <EyeIcon />
           </button>
         </div>
       </div>
@@ -114,14 +108,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
         </div>
         <div className="mt-auto pt-4 flex justify-between items-center">
           <p className="text-xl font-extrabold text-teal-600 dark:text-teal-400">₹{product.price}</p>
-          <button 
-            onClick={handleAddToCart}
-            disabled={isOutOfStock}
-            className="flex items-center justify-center gap-2 bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ShoppingCartIcon className="w-5 h-5"/>
-            <span>{hasVariants ? 'Select Options' : 'Add to Cart'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleQuickView}
+              className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-teal-500 hover:text-white transition-colors"
+              aria-label="Quick view"
+              title="Quick view"
+            >
+              <EyeIcon />
+            </button>
+            <button
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}
+              className="p-2.5 rounded-full bg-gray-800 text-white dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label={hasVariants ? 'Select options' : 'Add to cart'}
+              title={hasVariants ? 'Select options' : 'Add to cart'}
+            >
+              <ShoppingCartIcon className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
