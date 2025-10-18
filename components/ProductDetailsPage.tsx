@@ -17,6 +17,12 @@ import { generateDescriptionWithGemini } from '../services/geminiService';
 import { SparklesIcon } from './icons/SparklesIcon';
 import RelatedProducts from './RelatedProducts';
 import { useSEO } from '../hooks/useSEO';
+import Lightbox from './Lightbox';
+import { FacebookIcon } from './icons/FacebookIcon';
+import { TwitterIcon } from './icons/TwitterIcon';
+import { WhatsAppIcon } from './icons/WhatsAppIcon';
+import { LinkIcon } from './icons/LinkIcon';
+import { useToast } from './ToastProvider';
 
 interface ProductDetailsPageProps {
   product: Product;
@@ -29,6 +35,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isItemInWishlist } = useWishlist();
   const { getAverageRating } = useReviews();
+  const { showToast } = useToast();
   
   const allImages = product.variants ? [product.imageUrl, ...product.variants.map(v => v.imageUrl)] : [product.imageUrl];
   const uniqueImages = [...new Set(allImages)];
@@ -38,16 +45,16 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
       );
   const [mainImage, setMainImage] = useState(product.imageUrl);
   const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
   
   const [aiDescription, setAiDescription] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
   const { average, count } = getAverageRating(product.id);
   
   // SEO & Structured Data
-  const seoTitle = `${product.name} | CoverCart - Premium Mobile Covers`;
+  const seoTitle = `${product.name} | covercove.com - Premium Mobile Covers`;
   const seoDescription = product.description.substring(0, 160);
   const totalStock = product.variants?.reduce((sum, v) => sum + v.stock, 0) ?? product.stock ?? 0;
   
@@ -82,7 +89,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   useSEO({
     title: seoTitle,
     description: seoDescription,
-    keywords: `mobile cover, phone case, ${product.name}, ${product.category}, covercart`,
+    keywords: `mobile cover, phone case, ${product.name}, ${product.category}, covercove.com`,
     schema: productSchema,
   });
 
@@ -97,10 +104,10 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
     setSelectedVariant(initialVariant);
     setMainImage(initialVariant ? initialVariant.imageUrl : product.imageUrl);
     setQuantity(1);
-    setAddedToCart(false);
     setAiDescription(null);
     setIsGenerating(false);
     setGenerationError(null);
+    setIsLightboxOpen(false); // Close lightbox when product changes
   }, [product]);
 
   const isInWishlist = isItemInWishlist(product.id);
@@ -124,8 +131,6 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   const handleAddToCart = () => {
     if (isOutOfStock) return;
     addToCart(product, selectedVariant || undefined, quantity);
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2500);
   };
   
   const handleWishlistClick = () => {
@@ -147,6 +152,32 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
     } finally {
         setIsGenerating(false);
     }
+  };
+
+  const handleShare = (platform: 'facebook' | 'twitter' | 'whatsapp' | 'copy') => {
+    const url = window.location.href;
+    const text = `Check out this awesome phone case: ${product.name} from covercove.com!`;
+
+    if (platform === 'copy') {
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Link copied to clipboard!', 'success');
+      });
+      return;
+    }
+
+    let shareUrl = '';
+    switch(platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + url)}`;
+        break;
+    }
+    window.open(shareUrl, '_blank', 'noopener,noreferrer');
   };
 
   const isColorLight = (hexColor: string) => {
@@ -178,7 +209,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image Gallery */}
           <div>
-            <div className="mb-4">
+            <div className="mb-4 cursor-pointer" onClick={() => setIsLightboxOpen(true)} title="Click to enlarge">
                <ImageZoom imageUrl={mainImage} alt={imageAltText} />
             </div>
             <div className="grid grid-cols-5 gap-2">
@@ -266,7 +297,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
             )}
             
             {/* Actions */}
-            <div className="flex items-center gap-4 mt-auto pt-6 border-t dark:border-gray-700">
+            <div className="flex items-center gap-4">
                 <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
                     <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Decrease quantity" disabled={isOutOfStock}>
                         <MinusIcon className="w-4 h-4" />
@@ -280,10 +311,10 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
                 <button
                     onClick={handleAddToCart}
                     className="flex-grow flex items-center justify-center bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={isOutOfStock || addedToCart}
+                    disabled={isOutOfStock}
                 >
                     <ShoppingCartIcon className="w-6 h-6" />
-                    <span className="ml-2">{addedToCart ? 'Added!' : isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
+                    <span className="ml-2">{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
                 </button>
 
                 <button
@@ -299,6 +330,16 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
                 </button>
             </div>
 
+            {/* Social Share */}
+            <div className="mt-6 pt-6 border-t dark:border-gray-700 flex items-center gap-4">
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Share:</span>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => handleShare('whatsapp')} className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Share on WhatsApp"><WhatsAppIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" /></button>
+                    <button onClick={() => handleShare('facebook')} className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Share on Facebook"><FacebookIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" /></button>
+                    <button onClick={() => handleShare('twitter')} className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Share on Twitter"><TwitterIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" /></button>
+                    <button onClick={() => handleShare('copy')} className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Copy link"><LinkIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" /></button>
+                </div>
+            </div>
           </div>
         </div>
       </div>
@@ -310,6 +351,9 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
         onProductClick={onProductClick}
         onQuickViewClick={onQuickViewClick}
       />
+      {isLightboxOpen && (
+        <Lightbox imageUrl={mainImage} onClose={() => setIsLightboxOpen(false)} />
+      )}
     </div>
   );
 };

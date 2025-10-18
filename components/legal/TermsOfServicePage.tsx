@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface LegalPageProps {
@@ -26,7 +27,7 @@ const TermsOfServicePage: React.FC<LegalPageProps> = ({ onBack }) => {
             <p>All purchases and transactions are finalized through third-party platforms such as WhatsApp. We are not responsible for any issues that arise from the use of these third-party services. All payments are subject to their terms and conditions.</p>
             
             <h2 className="text-xl font-semibold text-[--color-text] pt-4">4. Limitation of Liability</h2>
-            <p>In no event shall CoverCart, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
+            <p>In no event shall covercove.com, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
 
             <h2 className="text-xl font-semibold text-[--color-text] pt-4">5. Governing Law</h2>
             <p>These Terms shall be governed and construed in accordance with the laws of India, without regard to its conflict of law provisions.</p>

@@ -1,7 +1,8 @@
+
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Order } from '../types';
 
-const ORDERS_STORAGE_KEY = 'covercart-orders';
+const ORDERS_STORAGE_KEY = 'covercove-orders';
 
 interface OrderContextType {
   orders: Order[];

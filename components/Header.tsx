@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -54,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
         <div className="flex items-center space-x-8">
             <a href="#/" onClick={handleLogoClick} className="flex items-center space-x-2 text-2xl font-bold text-[--color-text]">
             <LogoIcon />
-            <span style={{fontFamily: 'var(--font-heading)'}}>CoverCart</span>
+            <span style={{fontFamily: 'var(--font-heading)'}}>covercove.com</span>
             </a>
             <div className="hidden md:flex items-center space-x-6">
                 <a href="#products" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Products</a>

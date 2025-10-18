@@ -15,11 +15,12 @@ const Footer: React.FC = () => {
       'Are you sure you want to clear all app data? This will remove all products, reviews, cart, and wishlist items from your local storage. This action cannot be undone.'
     );
     if (isConfirmed) {
-      localStorage.removeItem('covercart-reviews');
-      localStorage.removeItem('covercart-products');
-      localStorage.removeItem('covercart-cart');
-      localStorage.removeItem('covercart-wishlist');
-      localStorage.removeItem('covercart-user-gallery');
+      localStorage.removeItem('covercove-reviews');
+      localStorage.removeItem('covercove-products');
+      localStorage.removeItem('covercove-cart');
+      localStorage.removeItem('covercove-wishlist');
+      localStorage.removeItem('covercove-user-gallery');
+      localStorage.removeItem('covercove-orders');
       sessionStorage.removeItem('isAdminAuthenticated');
 
       alert('Application cache has been cleared. The page will now reload.');
@@ -57,7 +58,7 @@ const Footer: React.FC = () => {
           <div>
             <h5 className="font-bold text-white uppercase tracking-wider">Quick Links</h5>
             <ul className="mt-4 space-y-2">
-              <li><a href="#products" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Products</a></li>
+              <li><a href="#products" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Collection</a></li>
               <li><a href="#ai-designer" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">AI Designer</a></li>
               <li><a href="#about" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">About Us</a></li>
               <li><a href="#contact" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Contact</a></li>
@@ -66,42 +67,36 @@ const Footer: React.FC = () => {
 
           {/* Legal */}
           <div>
-            <h5 className="font-bold text-white uppercase tracking-wider">Legal</h5>
+            <h5 className="font-bold text-white uppercase tracking-wider">Customer Service</h5>
             <ul className="mt-4 space-y-2">
+              <li><a href="#/orders" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Order Tracking</a></li>
               <li><a href="#/privacy" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Privacy Policy</a></li>
               <li><a href="#/terms" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Terms of Service</a></li>
               <li><a href="#/refunds" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Refund Policy</a></li>
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Newsletter */}
           <div>
-            <h5 className="font-bold text-white uppercase tracking-wider">Contact Us</h5>
-            <ul className="mt-4 space-y-2 text-sm">
-                <li className="text-gray-400">{BUSINESS_INFO.address}</li>
-                <li className="text-gray-400">
-                    <a href={`tel:${BUSINESS_INFO.phone}`} className="hover:text-white hover:underline transition-colors">{BUSINESS_INFO.phone}</a>
-                </li>
-            </ul>
+            <h5 className="font-bold text-white uppercase tracking-wider">Stay Updated</h5>
+            <p className="mt-4 text-sm text-gray-400">
+              Get the latest news and special offers. (No spam, we promise!)
+            </p>
+            <form className="mt-4 flex">
+              <input type="email" placeholder="Your email" className="w-full px-4 py-2 rounded-l-md bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
+              <button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-r-md transition-colors">
+                Subscribe
+              </button>
+            </form>
           </div>
         </div>
-        
+
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-gray-700 text-center text-sm">
-          <p className="text-gray-400">&copy; {currentYear} {BUSINESS_INFO.name}. All Rights Reserved.</p>
-           <div className="mt-4 space-x-4">
-            <a href="#/admin" className="text-xs text-gray-500 hover:text-gray-300 hover:underline transition-colors">
-                Admin Panel
-            </a>
-            <span className="text-gray-600">|</span>
-            <button
-                onClick={handleClearCache}
-                className="text-xs text-gray-500 hover:text-gray-300 hover:underline transition-colors"
-                title="Clears all locally stored app data."
-            >
-                Clear App Cache
-            </button>
-            </div>
+        <div className="mt-12 pt-8 border-t border-gray-700 text-center text-sm text-gray-400">
+          <p>&copy; {currentYear} {BUSINESS_INFO.name}. All Rights Reserved.</p>
+           <button onClick={handleClearCache} className="mt-4 text-xs text-gray-500 hover:text-gray-300 hover:underline">
+             Clear Application Cache
+           </button>
         </div>
       </div>
     </footer>

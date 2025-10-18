@@ -15,6 +15,9 @@ import TermsOfServicePage from './components/legal/TermsOfServicePage';
 import RefundPolicyPage from './components/legal/RefundPolicyPage';
 import { useSEO } from './hooks/useSEO';
 import { BUSINESS_INFO } from './constants';
+import ProductDetailsSkeleton from './components/ProductDetailsSkeleton';
+import { ToastContainer } from './components/ToastProvider';
+import OrderHistoryPage from './components/OrderHistoryPage';
 
 const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -23,13 +26,13 @@ const App: React.FC = () => {
   const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce the search query
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [currentPath, setCurrentPath] = useState(window.location.hash || '#/');
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
 
   // Default SEO for the entire app / home page
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "CoverCart",
+    "name": "covercove.com",
     "url": window.location.origin,
     "logo": `${window.location.origin}/vite.svg`, // Assuming vite.svg is the logo
     "contactPoint": {
@@ -40,7 +43,7 @@ const App: React.FC = () => {
   };
 
   useSEO({
-    title: 'CoverCart - AI & Designer Mobile Covers and Cases',
+    title: 'covercove.com - AI & Designer Mobile Covers and Cases',
     description: 'Discover a stunning collection of mobile covers or design your own with AI. High-quality cases for Apple, Samsung, Google, and more.',
     keywords: 'mobile cover, phone case, ai design, custom phone case, samsung case, apple iphone cover',
     schema: organizationSchema,
@@ -79,6 +82,9 @@ const App: React.FC = () => {
 
   const renderedPage = useMemo(() => {
     if (currentPath.startsWith('#/product/')) {
+      if (loading) {
+        return <ProductDetailsSkeleton />;
+      }
       const productId = parseInt(currentPath.split('/')[2], 10);
       const product = products.find(p => p.id === productId);
       if (product) {
@@ -112,6 +118,10 @@ const App: React.FC = () => {
       return <RefundPolicyPage onBack={handleBackToList} />;
     }
 
+    if (currentPath === '#/orders') {
+      return <OrderHistoryPage onBack={handleBackToList} />;
+    }
+
     // Default to home page
     return (
       <HomePage 
@@ -120,7 +130,7 @@ const App: React.FC = () => {
         onQuickViewClick={handleQuickViewOpen}
       />
     );
-  }, [currentPath, products, debouncedSearchQuery]);
+  }, [currentPath, products, debouncedSearchQuery, loading]);
 
   return (
     <div className="min-h-screen text-gray-800 dark:text-gray-200 font-sans antialiased">
@@ -142,6 +152,7 @@ const App: React.FC = () => {
         product={quickViewProduct} 
         onViewFullDetails={handleViewFullDetails}
       />
+      <ToastContainer />
     </div>
   );
 };

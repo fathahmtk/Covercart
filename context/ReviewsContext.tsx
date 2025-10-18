@@ -1,7 +1,8 @@
+
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { Review } from '../types';
 
-const REVIEWS_STORAGE_KEY = 'covercart-reviews';
+const REVIEWS_STORAGE_KEY = 'covercove-reviews';
 
 interface ReviewsContextType {
   reviews: Record<string, Review[]>;

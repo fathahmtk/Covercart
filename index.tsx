@@ -8,6 +8,7 @@ import { WishlistProvider } from './context/WishlistContext';
 import { ReviewsProvider } from './context/ReviewsContext';
 import { UserGalleryProvider } from './context/UserGalleryContext';
 import { OrderProvider } from './context/OrderContext';
+import { ToastProvider } from './components/ToastProvider';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,19 +17,21 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <ThemeProvider>
-      <ProductProvider>
-        <ReviewsProvider>
-          <UserGalleryProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <OrderProvider>
-                  <App />
-                </OrderProvider>
-              </WishlistProvider>
-            </CartProvider>
-          </UserGalleryProvider>
-        </ReviewsProvider>
-      </ProductProvider>
+      <ToastProvider>
+        <ProductProvider>
+          <ReviewsProvider>
+            <UserGalleryProvider>
+              <CartProvider>
+                <WishlistProvider>
+                  <OrderProvider>
+                    <App />
+                  </OrderProvider>
+                </WishlistProvider>
+              </CartProvider>
+            </UserGalleryProvider>
+          </ReviewsProvider>
+        </ProductProvider>
+      </ToastProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

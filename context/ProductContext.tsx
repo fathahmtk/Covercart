@@ -1,8 +1,9 @@
+
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Product } from '../types';
 import { MOCK_PRODUCTS } from '../constants';
 
-const PRODUCTS_STORAGE_KEY = 'covercart-products';
+const PRODUCTS_STORAGE_KEY = 'covercove-products';
 
 interface ProductContextType {
   products: Product[];

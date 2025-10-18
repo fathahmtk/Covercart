@@ -1,8 +1,9 @@
 import React, { createContext, useState, useContext, ReactNode, useMemo, useEffect } from 'react';
 import { Product, CartItem, ProductVariant } from '../types';
 import { useProducts } from './ProductContext';
+import { useToast } from '../components/ToastProvider';
 
-const CART_STORAGE_KEY = 'covercart-cart';
+const CART_STORAGE_KEY = 'covercove-cart';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -28,7 +29,8 @@ const loadCartFromStorage = (): CartItem[] => {
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>(loadCartFromStorage);
-  const { products } = useProducts(); // Access to all product data for stock checking
+  const { products } = useProducts();
+  const { showToast } = useToast();
 
   useEffect(() => {
     try {
@@ -52,16 +54,23 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const addToCart = (product: Product, variant?: ProductVariant, quantity = 1) => {
     const cartItemId = variant ? `${product.id}-${variant.id}` : `${product.id}-0`;
     const availableStock = getStockForProduct(product.id, variant?.id);
+    let itemAdded = false;
 
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.cartItemId === cartItemId);
       const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
 
-      if (currentQuantityInCart + quantity > availableStock) {
-        // Here you could trigger a toast notification instead of an alert for better UX
-        alert(`Sorry, you can't add more of this item. Only ${availableStock} left in stock.`);
+      if (availableStock === 0) {
+        showToast('Sorry, this item is out of stock.', 'error');
         return prevItems;
       }
+      
+      if (currentQuantityInCart + quantity > availableStock) {
+        showToast(`Only ${availableStock} left in stock.`, 'error');
+        return prevItems;
+      }
+
+      itemAdded = true;
 
       if (existingItem) {
         return prevItems.map(item =>
@@ -83,6 +92,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
       return [...prevItems, newItem];
     });
+
+    if (itemAdded) {
+      showToast(`${product.name} added to cart!`, 'success');
+    }
   };
 
   const removeFromCart = (cartItemId: string) => {
@@ -101,7 +114,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       
       if (quantity > availableStock) {
-        alert(`Only ${availableStock} items in stock. Quantity has been adjusted.`);
+        showToast(`Only ${availableStock} items in stock.`, 'error');
         return prevItems.map(item =>
             item.cartItemId === cartItemId ? { ...item, quantity: availableStock } : item
         );

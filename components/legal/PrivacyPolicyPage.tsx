@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface LegalPageProps {
@@ -17,7 +18,7 @@ const PrivacyPolicyPage: React.FC<LegalPageProps> = ({ onBack }) => {
             <p>Last Updated: {new Date().toLocaleDateString()}</p>
             
             <h2 className="text-xl font-semibold text-[--color-text] pt-4">1. Introduction</h2>
-            <p>Welcome to CoverCart. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
+            <p>Welcome to covercove.com. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
             
             <h2 className="text-xl font-semibold text-[--color-text] pt-4">2. Information We Collect</h2>
             <p>We may collect personal information from you such as your name, email address, and phone number when you place an order or contact us. This application stores cart, wishlist, and product data in your browser's local storage. This data is not transmitted to our servers and remains on your device.</p>

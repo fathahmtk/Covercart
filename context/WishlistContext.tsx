@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { Product } from '../types';
+import { useToast } from '../components/ToastProvider';
 
-const WISHLIST_STORAGE_KEY = 'covercart-wishlist';
+const WISHLIST_STORAGE_KEY = 'covercove-wishlist';
 
 interface WishlistContextType {
   wishlistItems: Product[];
@@ -25,6 +26,7 @@ const loadWishlistFromStorage = (): Product[] => {
 
 export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState<Product[]>(loadWishlistFromStorage);
+  const { showToast } = useToast();
   
   useEffect(() => {
     try {
@@ -41,6 +43,7 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
   const addToWishlist = (product: Product) => {
     setWishlistItems(prevItems => {
       if (!isItemInWishlist(product.id)) {
+        showToast(`${product.name} added to wishlist!`, 'success');
         return [...prevItems, product];
       }
       return prevItems;
@@ -48,6 +51,10 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const removeFromWishlist = (productId: number) => {
+    const item = wishlistItems.find(item => item.id === productId);
+    if(item) {
+        showToast(`${item.name} removed from wishlist.`, 'info');
+    }
     setWishlistItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
 

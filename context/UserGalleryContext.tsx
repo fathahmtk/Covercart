@@ -1,7 +1,8 @@
+
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { UserGalleryItem } from '../types';
 
-const GALLERY_STORAGE_KEY = 'covercart-user-gallery';
+const GALLERY_STORAGE_KEY = 'covercove-user-gallery';
 
 interface UserGalleryContextType {
   galleryItems: Record<string, UserGalleryItem[]>;
