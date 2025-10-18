@@ -11,8 +11,8 @@ const About: React.FC = () => {
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="lg:w-1/2">
               <LazyImage 
-                src="https://picsum.photos/seed/store/800/600" 
-                alt="CoverCart Workshop" 
+                src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=800&auto=format&fit=crop" 
+                alt="A person holding a phone and using a credit card, representing e-commerce" 
                 className="rounded-lg shadow-2xl"
               />
             </div>

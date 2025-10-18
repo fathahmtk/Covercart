@@ -13,6 +13,8 @@ import { useDebounce } from './hooks/useDebounce';
 import PrivacyPolicyPage from './components/legal/PrivacyPolicyPage';
 import TermsOfServicePage from './components/legal/TermsOfServicePage';
 import RefundPolicyPage from './components/legal/RefundPolicyPage';
+import { useSEO } from './hooks/useSEO';
+import { BUSINESS_INFO } from './constants';
 
 const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -22,6 +24,28 @@ const App: React.FC = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [currentPath, setCurrentPath] = useState(window.location.hash || '#/');
   const { products } = useProducts();
+
+  // Default SEO for the entire app / home page
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "CoverCart",
+    "url": window.location.origin,
+    "logo": `${window.location.origin}/vite.svg`, // Assuming vite.svg is the logo
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": BUSINESS_INFO.phone,
+      "contactType": "customer service"
+    }
+  };
+
+  useSEO({
+    title: 'CoverCart - AI & Designer Mobile Covers and Cases',
+    description: 'Discover a stunning collection of mobile covers or design your own with AI. High-quality cases for Apple, Samsung, Google, and more.',
+    keywords: 'mobile cover, phone case, ai design, custom phone case, samsung case, apple iphone cover',
+    schema: organizationSchema,
+  });
+
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -58,7 +82,14 @@ const App: React.FC = () => {
       const productId = parseInt(currentPath.split('/')[2], 10);
       const product = products.find(p => p.id === productId);
       if (product) {
-        return <ProductDetailsPage product={product} onBack={handleBackToList} />;
+        return (
+          <ProductDetailsPage 
+            product={product} 
+            onBack={handleBackToList} 
+            onProductClick={handleProductClick}
+            onQuickViewClick={handleQuickViewOpen}
+          />
+        );
       }
       // Fallback if product not found
       window.location.hash = '#/';

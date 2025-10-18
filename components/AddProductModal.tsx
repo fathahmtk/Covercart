@@ -18,10 +18,11 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
   
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
+  const [stock, setStock] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState(CATEGORIES[1]);
   const [mainImage, setMainImage] = useState<string | null>(null);
-  const [variants, setVariants] = useState<Omit<ProductVariant, 'id'>[]>([]);
+  const [variants, setVariants] = useState<Partial<ProductVariant>[]>([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
       setCategory(productToEdit.category);
       setMainImage(productToEdit.imageUrl);
       setVariants(productToEdit.variants || []);
+      setStock(String(productToEdit.stock ?? ''));
     } else {
       resetForm();
     }
@@ -40,6 +42,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
   const resetForm = () => {
     setName('');
     setPrice('');
+    setStock('');
     setDescription('');
     setCategory(CATEGORIES[1]);
     setMainImage(null);
@@ -76,27 +79,27 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
   };
 
   const handleAddVariant = () => {
-    setVariants([...variants, { name: '', colorCode: '#000000', imageUrl: '' }]);
+    setVariants([...variants, { name: '', colorCode: '#000000', imageUrl: '', stock: 0 }]);
   };
 
   const handleRemoveVariant = (index: number) => {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
-  const handleVariantChange = (index: number, field: keyof Omit<ProductVariant, 'id' | 'imageUrl'>, value: string) => {
+  const handleVariantChange = (index: number, field: keyof Omit<ProductVariant, 'id' | 'imageUrl'>, value: string | number) => {
     const newVariants = [...variants];
-    newVariants[index][field] = value;
+    (newVariants[index] as any)[field] = value;
     setVariants(newVariants);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !price || !description || !mainImage) {
+    if (!name || !price || !description || !mainImage || (variants.length === 0 && !stock)) {
       setError('Please fill all required fields and upload a main image.');
       return;
     }
-    if (variants.some(v => !v.name || !v.imageUrl)) {
-        setError('Please ensure all variants have a name and an image.');
+    if (variants.some(v => !v.name || !v.imageUrl || v.stock === undefined)) {
+        setError('Please ensure all variants have a name, an image, and a stock quantity.');
         return;
     }
     setError('');
@@ -106,12 +109,17 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
         price: parseFloat(price),
         description,
         category,
+        // FIX: Added missing 'brand' property to satisfy the Product type.
+        // Based on existing data, brand is the same as category.
+        brand: category,
         imageUrl: mainImage,
+        stock: variants.length > 0 ? undefined : parseInt(stock, 10),
         variants: variants.map((v, i) => ({
-            id: (v as ProductVariant).id || Date.now() + i + 1,
-            name: v.name,
-            colorCode: v.colorCode,
+            id: v.id || Date.now() + i + 1,
+            name: v.name!,
+            colorCode: v.colorCode!,
             imageUrl: v.imageUrl!,
+            stock: Number(v.stock!),
         }))
     };
     
@@ -159,24 +167,31 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
                   {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-               <div>
+              {variants.length === 0 && (
+                <div>
+                  <label htmlFor="stock" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock Quantity</label>
+                  <input type="number" id="stock" value={stock} onChange={e => setStock(e.target.value)} className="mt-1 input-style" required />
+                </div>
+              )}
+            </div>
+             <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Main Image</label>
                 <ImageUploader image={mainImage} onUpload={e => handleImageUpload(e)} id="main-image-upload" />
               </div>
-            </div>
             <div className="space-y-4 pt-4 border-t dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Variants</h3>
               {variants.map((variant, index) => (
                 <div key={index} className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-md space-y-3 relative">
                   <button type="button" onClick={() => handleRemoveVariant(index)} className="absolute -top-2 -right-2 text-gray-400 hover:text-red-500"><XCircleIcon /></button>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" placeholder="Variant Name (e.g., Midnight Black)" value={variant.name} onChange={e => handleVariantChange(index, 'name', e.target.value)} className="input-style" required />
-                    <div className="flex items-center gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" placeholder="Variant Name" value={variant.name} onChange={e => handleVariantChange(index, 'name', e.target.value)} className="input-style md:col-span-2" required />
+                    <input type="number" placeholder="Stock" value={variant.stock} onChange={e => handleVariantChange(index, 'stock', parseInt(e.target.value, 10) || 0)} className="input-style" required />
+                  </div>
+                   <div className="flex items-center gap-2">
                        <input type="color" value={variant.colorCode} onChange={e => handleVariantChange(index, 'colorCode', e.target.value)} className="h-10 w-12 p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer" />
                        <span className="text-sm text-gray-500 dark:text-gray-400">Variant Color</span>
                     </div>
-                  </div>
-                  <ImageUploader image={variant.imageUrl} onUpload={e => handleImageUpload(e, index)} id={`variant-image-${index}`} />
+                  <ImageUploader image={variant.imageUrl ?? null} onUpload={e => handleImageUpload(e, index)} id={`variant-image-${index}`} />
                 </div>
               ))}
               <button type="button" onClick={handleAddVariant} className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline">+ Add Variant</button>

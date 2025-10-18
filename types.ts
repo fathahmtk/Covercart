@@ -1,8 +1,9 @@
 export interface ProductVariant {
   id: number;
-  name: string; // e.g., "Galaxy Black"
+  name: string;
   imageUrl: string;
-  colorCode: string; // e.g., "#000000"
+  colorCode: string;
+  stock: number;
 }
 
 export interface Product {
@@ -10,20 +11,33 @@ export interface Product {
   name: string;
   price: number;
   description: string;
-  imageUrl: string; // Default image
+  imageUrl: string;
   category: string;
+  brand: string;
   variants?: ProductVariant[];
+  stock?: number;
 }
 
 export interface CartItem {
-  cartItemId: string; // Unique identifier, e.g., "1-101" for product 1, variant 101
+  cartItemId: string;
   productId: number;
   productName: string;
   variantId?: number;
   variantName?: string;
   price: number;
-  imageUrl: string; // Variant or main product image
+  imageUrl: string;
   quantity: number;
+}
+
+export interface Order {
+  id: string;
+  customerName: string;
+  mobileNumber: string;
+  deliveryAddress: string;
+  items: CartItem[];
+  total: number;
+  status: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
+  date: string;
 }
 
 export interface Review {

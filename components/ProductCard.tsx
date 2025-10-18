@@ -34,9 +34,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
   const shareContainerRef = useRef<HTMLDivElement>(null);
 
   const displayImageUrl = selectedVariant ? selectedVariant.imageUrl : product.imageUrl;
+  const imageAltText = `${product.name} ${product.category} Case ${selectedVariant ? `- ${selectedVariant.name}` : ''}`.trim();
   const { average, count } = getAverageRating(product.id);
   const isInWishlist = isItemInWishlist(product.id);
   const productUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+  
+  const currentStock = selectedVariant ? selectedVariant.stock : product.stock ?? 0;
+  const isOutOfStock = currentStock === 0;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -63,6 +67,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isOutOfStock) return;
+    
     if (product.variants && selectedVariant) {
       addToCart(product, selectedVariant);
     } else if (!product.variants) {
@@ -132,15 +138,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
   return (
     <div 
         onClick={() => onProductClick(product)}
-        className="cursor-pointer bg-[--color-bg] rounded-xl shadow-md overflow-hidden group transform hover:-translate-y-2 transition-all duration-300 border border-[--color-border] hover:shadow-2xl hover:shadow-[--color-primary]/20 hover:border-[--color-primary]/50 h-full flex flex-col"
+        className="cursor-pointer bg-[--color-bg] rounded-xl shadow-md overflow-hidden group transition-all duration-300 border border-[--color-border] hover:scale-105 hover:shadow-2xl hover:shadow-[--color-primary]/20 hover:border-[--color-primary]/50 h-full flex flex-col"
     >
       <div className="relative overflow-hidden">
         <LazyImage
           src={displayImageUrl}
-          alt={product.name}
-          className="w-full h-64 object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+          alt={imageAltText}
+          className="w-full h-64 object-cover transition-transform duration-300 ease-in-out"
         />
         
+        {isOutOfStock && (
+            <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full uppercase">
+                Out of Stock
+            </div>
+        )}
+
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
           <button
             onClick={handleQuickViewClick}
@@ -258,10 +270,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
           <p className="text-2xl font-bold text-[--color-primary]">₹{product.price}</p>
           <button 
             onClick={handleAddToCart}
-            className="flex items-center bg-gray-800 text-white py-2 px-4 rounded-lg hover:bg-black dark:bg-[--color-primary] dark:hover:bg-[--color-primary-hover] transition-colors"
+            disabled={isOutOfStock}
+            className="flex items-center bg-gray-800 text-white py-2 px-4 rounded-lg hover:bg-black dark:bg-[--color-primary] dark:hover:bg-[--color-primary-hover] transition-colors disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
           >
             <ShoppingCartIcon className="w-5 h-5" />
-            <span className="ml-2 text-sm font-semibold">Add to Cart</span>
+            <span className="ml-2 text-sm font-semibold">{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
           </button>
         </div>
       </div>

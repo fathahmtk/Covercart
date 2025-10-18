@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useMemo, useEffect } from 'react';
 import { Product, CartItem, ProductVariant } from '../types';
+import { useProducts } from './ProductContext';
 
 const CART_STORAGE_KEY = 'covercart-cart';
 
@@ -27,6 +28,7 @@ const loadCartFromStorage = (): CartItem[] => {
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>(loadCartFromStorage);
+  const { products } = useProducts(); // Access to all product data for stock checking
 
   useEffect(() => {
     try {
@@ -36,11 +38,30 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [cartItems]);
 
+  const getStockForProduct = (productId: number, variantId?: number): number => {
+    const product = products.find(p => p.id === productId);
+    if (!product) return 0;
+
+    if (variantId && product.variants) {
+        const variant = product.variants.find(v => v.id === variantId);
+        return variant ? variant.stock : 0;
+    }
+    return product.stock ?? 0;
+  };
+
   const addToCart = (product: Product, variant?: ProductVariant, quantity = 1) => {
     const cartItemId = variant ? `${product.id}-${variant.id}` : `${product.id}-0`;
+    const availableStock = getStockForProduct(product.id, variant?.id);
 
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.cartItemId === cartItemId);
+      const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
+
+      if (currentQuantityInCart + quantity > availableStock) {
+        // Here you could trigger a toast notification instead of an alert for better UX
+        alert(`Sorry, you can't add more of this item. Only ${availableStock} left in stock.`);
+        return prevItems;
+      }
 
       if (existingItem) {
         return prevItems.map(item =>
@@ -70,9 +91,22 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const updateQuantity = (cartItemId: string, quantity: number) => {
     setCartItems(prevItems => {
+      const itemToUpdate = prevItems.find(item => item.cartItemId === cartItemId);
+      if (!itemToUpdate) return prevItems;
+      
+      const availableStock = getStockForProduct(itemToUpdate.productId, itemToUpdate.variantId);
+
       if (quantity <= 0) {
         return prevItems.filter(item => item.cartItemId !== cartItemId);
       }
+      
+      if (quantity > availableStock) {
+        alert(`Only ${availableStock} items in stock. Quantity has been adjusted.`);
+        return prevItems.map(item =>
+            item.cartItemId === cartItemId ? { ...item, quantity: availableStock } : item
+        );
+      }
+      
       return prevItems.map(item =>
         item.cartItemId === cartItemId ? { ...item, quantity } : item
       );

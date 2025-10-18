@@ -32,6 +32,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ isOpen, onClose, produc
       setSelectedVariant(initialVariant);
       setMainImage(initialVariant ? initialVariant.imageUrl : product.imageUrl);
       setQuantity(1); // Reset quantity when product changes
+      setAddedToCart(false);
     }
   }, [product]);
 
@@ -40,9 +41,13 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ isOpen, onClose, produc
   const { average, count } = getAverageRating(product.id);
   const uniqueImages = product.variants ? [...new Set([product.imageUrl, ...product.variants.map(v => v.imageUrl)])] : [product.imageUrl];
 
+  const currentStock = selectedVariant ? selectedVariant.stock : product.stock ?? 0;
+  const isOutOfStock = currentStock === 0;
+
   const handleVariantSelect = (variant: ProductVariant) => {
     setSelectedVariant(variant);
     setMainImage(variant.imageUrl);
+    setQuantity(1);
   };
   
   const handleThumbnailClick = (imageUrl: string) => {
@@ -54,6 +59,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ isOpen, onClose, produc
   };
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     addToCart(product, selectedVariant || undefined, quantity);
     setAddedToCart(true);
     setTimeout(() => {
@@ -156,25 +162,26 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ isOpen, onClose, produc
                     </div>
                   </div>
                 )}
+                 {isOutOfStock && <p className="text-red-500 font-semibold mb-4">Out of Stock</p>}
 
                 <div className="mt-auto pt-6 border-t dark:border-gray-700">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
-                            <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Decrease quantity">
+                            <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Decrease quantity" disabled={isOutOfStock}>
                                 <MinusIcon className="w-4 h-4" />
                             </button>
                             <span className="px-4 text-lg font-semibold">{quantity}</span>
-                            <button onClick={() => setQuantity(q => q + 1)} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Increase quantity">
+                            <button onClick={() => setQuantity(q => Math.min(currentStock, q + 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Increase quantity" disabled={isOutOfStock || quantity >= currentStock}>
                                 <PlusIcon className="w-4 h-4" />
                             </button>
                         </div>
                         <button
                             onClick={handleAddToCart}
-                            className="flex-grow flex items-center justify-center bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors shadow-md disabled:opacity-70"
-                            disabled={addedToCart}
+                            className="flex-grow flex items-center justify-center bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isOutOfStock || addedToCart}
                         >
                             <ShoppingCartIcon className="w-6 h-6" />
-                            <span className="ml-2">{addedToCart ? 'Added!' : 'Add to Cart'}</span>
+                            <span className="ml-2">{addedToCart ? 'Added!' : isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
                         </button>
                     </div>
                     <button onClick={handleViewFullDetailsClick} className="w-full text-center text-sm text-teal-600 dark:text-teal-400 hover:underline">

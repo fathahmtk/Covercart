@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckIcon } from './icons/CheckIcon';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
+import RangeSlider from './RangeSlider';
 
 interface ProductFiltersProps {
   categories: string[];
@@ -19,6 +20,26 @@ interface ProductFiltersProps {
   resultCount: number;
 }
 
+// Helper component for a consistent collapsible section UI
+const FilterSection: React.FC<{ title: string; isOpen: boolean; onToggle: () => void; children: React.ReactNode }> = ({ title, isOpen, onToggle, children }) => {
+  return (
+    <div className="border-b border-[--color-border] last:border-b-0">
+      <button 
+        onClick={onToggle} 
+        className="w-full flex justify-between items-center py-4 font-semibold text-[--color-text] hover:bg-[--color-bg-subtle]/50 rounded-md px-2 -mx-2"
+        aria-expanded={isOpen}
+      >
+        <span>{title}</span>
+        <ChevronDownIcon className={`w-5 h-5 transition-transform duration-300 ${!isOpen ? '-rotate-90' : ''}`} />
+      </button>
+      <div className={`transition-[max-height,padding-bottom] duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[500px] pb-4' : 'max-h-0'}`}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+
 const ProductFilters: React.FC<ProductFiltersProps> = ({
   categories,
   selectedCategory,
@@ -35,14 +56,10 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   onReset,
   resultCount,
 }) => {
-  const [openSections, setOpenSections] = useState({ category: true, color: true });
+  const [openSections, setOpenSections] = useState({ category: true, price: true, color: true });
 
-  const toggleSection = (section: 'category' | 'color') => {
+  const toggleSection = (section: 'category' | 'color' | 'price') => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
-
-  const handlePriceSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onPriceChange({ ...priceRange, max: parseInt(e.target.value, 10) });
   };
   
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -65,94 +82,17 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   };
 
   return (
-    <div className="bg-[--color-bg-subtle] p-6 rounded-lg mb-12 shadow-sm border border-[--color-border]">
-      <div className="flex justify-between items-center mb-6 pb-4 border-b border-[--color-border]">
-        <h3 className="text-xl font-bold text-[--color-text]">Filters</h3>
-        <button
-          onClick={onReset}
-          className="text-sm font-semibold text-white bg-[--color-primary] hover:bg-[--color-primary-hover] px-4 py-2 rounded-full transition-colors shadow-sm"
-        >
-          Reset All
-        </button>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 items-start">
-        {/* Category Filter */}
-        <div className="col-span-1 md:col-span-2 lg:col-span-2">
-          <button onClick={() => toggleSection('category')} className="w-full flex justify-between items-center font-semibold text-gray-700 dark:text-gray-300 text-left">
-            <span>Category</span>
-            <ChevronDownIcon className={`w-5 h-5 transition-transform duration-300 ${!openSections.category ? '-rotate-180' : ''}`} />
-          </button>
-          <div className={`transition-all duration-300 ease-in-out overflow-hidden ${openSections.category ? 'max-h-96 pt-3' : 'max-h-0 pt-0'}`}>
-            <div className="flex flex-wrap gap-2">
-              {categories.map(category => (
-                <button
-                  key={category}
-                  onClick={() => onCategoryChange(category)}
-                  className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
-                    selectedCategory === category
-                      ? 'bg-[--color-primary] text-white shadow'
-                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-teal-100 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Price Filter */}
-        <div className="col-span-1 md:col-span-1 lg:col-span-2">
-          <h4 className="font-semibold text-gray-700 dark:text-gray-300">Max Price: <span className="font-bold text-[--color-primary]">₹{priceRange.max}</span></h4>
-          <input
-            type="range"
-            min="0"
-            max={maxPrice}
-            step="50"
-            value={priceRange.max}
-            onChange={handlePriceSliderChange}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mt-3"
-            aria-label="Price range slider"
-          />
-        </div>
-
-        {/* Color Filter */}
-        <div className="col-span-1 md:col-span-1 lg:col-span-2">
-           <button onClick={() => toggleSection('color')} className="w-full flex justify-between items-center font-semibold text-gray-700 dark:text-gray-300 text-left">
-            <span>Color</span>
-            <ChevronDownIcon className={`w-5 h-5 transition-transform duration-300 ${!openSections.color ? '-rotate-180' : ''}`} />
-          </button>
-           <div className={`transition-all duration-300 ease-in-out overflow-hidden ${openSections.color ? 'max-h-96 pt-3' : 'max-h-0 pt-0'}`}>
-            <div className="flex flex-wrap gap-3">
-              {availableColors.map(color => {
-                const isSelected = selectedColors.includes(color);
-                const checkmarkColor = isColorLight(color) ? 'text-gray-800' : 'text-white';
-                return (
-                  <button
-                    key={color}
-                    onClick={() => handleColorClick(color)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${isSelected ? 'border-[--color-primary] ring-2 ring-[--color-primary] ring-offset-1' : 'border-gray-300 dark:border-gray-500'}`}
-                    style={{ backgroundColor: color }}
-                    aria-label={`Filter by color ${color}`}
-                    title={color}
-                  >
-                    {isSelected && <CheckIcon className={`w-5 h-5 ${checkmarkColor}`} />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Sort Dropdown */}
-        <div className="col-span-1 md:col-span-1 lg:col-span-2">
-          <label htmlFor="sort-by" className="block font-semibold text-gray-700 dark:text-gray-300">Sort by</label>
+    <div className="bg-[--color-bg] p-6 rounded-lg mb-12 shadow-md border border-[--color-border]">
+      {/* Top Row: Title & Sorting */}
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
+        <h3 className="text-2xl font-bold text-[--color-text]">Filters</h3>
+        <div className="flex items-center gap-2 mt-3 sm:mt-0">
+          <label htmlFor="sort-by" className="text-sm font-medium text-[--color-text-muted] whitespace-nowrap">Sort by:</label>
           <select
             id="sort-by"
             value={selectedSort}
             onChange={handleSortChange}
-            className="w-full max-w-xs p-2 mt-3 border border-gray-300 rounded-md bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+            className="w-full sm:w-auto p-2 border border-[--color-border] rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-[--color-primary] focus:border-[--color-primary]"
           >
             {sortOptions.map(option => (
               <option key={option.value} value={option.value}>{option.label}</option>
@@ -160,12 +100,76 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
           </select>
         </div>
       </div>
+      
+      {/* Main Filters Area */}
+      <div>
+        <FilterSection title="Category" isOpen={openSections.category} onToggle={() => toggleSection('category')}>
+          <div className="flex flex-wrap gap-2">
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => onCategoryChange(category)}
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
+                  selectedCategory === category
+                    ? 'bg-[--color-primary] text-white shadow'
+                    : 'bg-[--color-bg-subtle] dark:bg-gray-700 text-[--color-text-muted] hover:bg-teal-100 dark:hover:bg-gray-600'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </FilterSection>
 
-      {/* Filter Actions */}
-      <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-center items-center">
-         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Showing <span className="font-bold text-[--color-text]">{resultCount}</span> products
+        <FilterSection title="Price Range" isOpen={openSections.price} onToggle={() => toggleSection('price')}>
+          <div className="px-2">
+            <div className="flex justify-between items-center text-sm font-bold text-[--color-primary] mb-2">
+                <span>₹{priceRange.min}</span>
+                <span>₹{priceRange.max}</span>
+            </div>
+            <RangeSlider
+              min={0}
+              max={maxPrice}
+              step={50}
+              value={priceRange}
+              onChange={onPriceChange}
+            />
+          </div>
+        </FilterSection>
+
+        <FilterSection title="Color" isOpen={openSections.color} onToggle={() => toggleSection('color')}>
+          <div className="flex flex-wrap gap-3">
+            {availableColors.map(color => {
+              const isSelected = selectedColors.includes(color);
+              const checkmarkColor = isColorLight(color) ? 'text-gray-800' : 'text-white';
+              return (
+                <button
+                  key={color}
+                  onClick={() => handleColorClick(color)}
+                  className={`w-8 h-8 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${isSelected ? 'border-[--color-primary] ring-2 ring-[--color-primary] ring-offset-1' : 'border-gray-300 dark:border-gray-500'}`}
+                  style={{ backgroundColor: color }}
+                  aria-label={`Filter by color ${color}`}
+                  title={color}
+                >
+                  {isSelected && <CheckIcon className={`w-5 h-5 ${checkmarkColor}`} />}
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
+      </div>
+
+      {/* Bottom Row: Results & Reset */}
+      <div className="mt-6 pt-4 border-t border-[--color-border] flex justify-between items-center">
+        <p className="text-sm font-semibold text-[--color-text-muted]">
+          {resultCount} Product{resultCount !== 1 && 's'} Found
         </p>
+        <button
+          onClick={onReset}
+          className="text-sm font-semibold text-white bg-[--color-primary] hover:bg-[--color-primary-hover] px-4 py-2 rounded-full transition-colors shadow-sm"
+        >
+          Reset Filters
+        </button>
       </div>
     </div>
   );

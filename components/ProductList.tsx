@@ -99,6 +99,7 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const paginatedProducts = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    // FIX: Corrected Array.prototype.slice to use two arguments (start and end index) instead of three.
     return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
   

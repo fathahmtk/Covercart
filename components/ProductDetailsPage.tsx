@@ -13,26 +13,82 @@ import { CheckIcon } from './icons/CheckIcon';
 import ImageZoom from './ImageZoom';
 import LazyImage from './LazyImage';
 import UserGallery from './UserGallery';
+import { generateDescriptionWithGemini } from '../services/geminiService';
+import { SparklesIcon } from './icons/SparklesIcon';
+import RelatedProducts from './RelatedProducts';
+import { useSEO } from '../hooks/useSEO';
 
 interface ProductDetailsPageProps {
   product: Product;
   onBack: () => void;
+  onProductClick: (product: Product) => void;
+  onQuickViewClick: (product: Product) => void;
 }
 
-const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack }) => {
+const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack, onProductClick, onQuickViewClick }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isItemInWishlist } = useWishlist();
   const { getAverageRating } = useReviews();
-
+  
   const allImages = product.variants ? [product.imageUrl, ...product.variants.map(v => v.imageUrl)] : [product.imageUrl];
   const uniqueImages = [...new Set(allImages)];
-
+  
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants && product.variants.length > 0 ? product.variants[0] : null
-  );
-  const [mainImage, setMainImage] = useState(selectedVariant ? selectedVariant.imageUrl : product.imageUrl);
+      product.variants && product.variants.length > 0 ? product.variants[0] : null
+      );
+  const [mainImage, setMainImage] = useState(product.imageUrl);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  
+  const [aiDescription, setAiDescription] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  
+  const { average, count } = getAverageRating(product.id);
+  
+  // SEO & Structured Data
+  const seoTitle = `${product.name} | CoverCart - Premium Mobile Covers`;
+  const seoDescription = product.description.substring(0, 160);
+  const totalStock = product.variants?.reduce((sum, v) => sum + v.stock, 0) ?? product.stock ?? 0;
+  
+  const productSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.imageUrl,
+    "description": product.description,
+    "brand": {
+        "@type": "Brand",
+        "name": product.brand || product.category
+    },
+    "sku": `CC-${product.id}`,
+    "offers": {
+        "@type": "Offer",
+        "url": window.location.href,
+        "priceCurrency": "INR",
+        "price": product.price,
+        "availability": totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        "itemCondition": "https://schema.org/NewCondition"
+    },
+    ...(count > 0 && {
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": average.toFixed(1),
+            "reviewCount": count
+        }
+    })
+  };
+  
+  useSEO({
+    title: seoTitle,
+    description: seoDescription,
+    keywords: `mobile cover, phone case, ${product.name}, ${product.category}, covercart`,
+    schema: productSchema,
+  });
+
+  const currentStock = selectedVariant ? selectedVariant.stock : product.stock ?? 0;
+  const isOutOfStock = currentStock === 0;
+  const isLowStock = currentStock > 0 && currentStock <= 5;
 
   useEffect(() => {
     // This effect runs when the component mounts or the product prop changes.
@@ -42,14 +98,18 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
     setMainImage(initialVariant ? initialVariant.imageUrl : product.imageUrl);
     setQuantity(1);
     setAddedToCart(false);
+    setAiDescription(null);
+    setIsGenerating(false);
+    setGenerationError(null);
   }, [product]);
 
   const isInWishlist = isItemInWishlist(product.id);
-  const { average, count } = getAverageRating(product.id);
+  const imageAltText = `${product.name} for ${product.category}`;
 
   const handleVariantSelect = (variant: ProductVariant) => {
     setSelectedVariant(variant);
     setMainImage(variant.imageUrl);
+    setQuantity(1); // Reset quantity on variant change
   };
   
   const handleThumbnailClick = (imageUrl: string) => {
@@ -61,6 +121,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   }
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     addToCart(product, selectedVariant || undefined, quantity);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2500);
@@ -73,6 +134,19 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
       addToWishlist(product);
     }
   };
+  
+  const handleGenerateDescription = async () => {
+    setIsGenerating(true);
+    setGenerationError(null);
+    try {
+        const description = await generateDescriptionWithGemini(product.name, product.category);
+        setAiDescription(description);
+    } catch (error) {
+        setGenerationError(error instanceof Error ? error.message : "An unknown error occurred.");
+    } finally {
+        setIsGenerating(false);
+    }
+  };
 
   const isColorLight = (hexColor: string) => {
     const color = hexColor.startsWith('#') ? hexColor.slice(1) : hexColor;
@@ -81,6 +155,16 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
     const b = parseInt(color.substring(4, 6), 16);
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return luminance > 0.5;
+  };
+
+  const StockIndicator = () => {
+    if (isOutOfStock) {
+        return <div className="px-3 py-1 text-sm font-bold text-red-800 bg-red-100 rounded-full inline-block">Out of Stock</div>;
+    }
+    if (isLowStock) {
+        return <div className="px-3 py-1 text-sm font-bold text-amber-800 bg-amber-100 rounded-full inline-block">Low Stock - Only {currentStock} left!</div>;
+    }
+    return <div className="px-3 py-1 text-sm font-bold text-green-800 bg-green-100 rounded-full inline-block">In Stock</div>;
   };
 
   return (
@@ -94,7 +178,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
           {/* Image Gallery */}
           <div>
             <div className="mb-4">
-               <ImageZoom imageUrl={mainImage} alt={product.name} />
+               <ImageZoom imageUrl={mainImage} alt={imageAltText} />
             </div>
             <div className="grid grid-cols-5 gap-2">
               {uniqueImages.map(imgUrl => (
@@ -103,7 +187,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
                   onClick={() => handleThumbnailClick(imgUrl)}
                   className={`rounded-md overflow-hidden transition-all duration-200 aspect-square ${mainImage === imgUrl ? 'ring-2 ring-teal-500 ring-offset-2' : 'hover:opacity-80'}`}
                 >
-                  <LazyImage src={imgUrl} alt="Product thumbnail" className="w-full h-full object-cover" />
+                  <LazyImage src={imgUrl} alt={`${imageAltText} thumbnail`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -120,7 +204,41 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
             </a>
 
             <p className="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-4">₹{product.price}</p>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">{product.description}</p>
+            
+            <div className="mb-4">
+                <StockIndicator />
+            </div>
+
+            <div className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6 min-h-[4.5rem]">
+              {aiDescription || product.description ? (
+                <p>{aiDescription || product.description}</p>
+              ) : (
+                <div>
+                  <p className="italic text-gray-400 dark:text-gray-500">No description available for this product.</p>
+                  <button
+                    onClick={handleGenerateDescription}
+                    disabled={isGenerating}
+                    className="mt-2 flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-[--color-primary] to-teal-400 hover:shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-wait px-4 py-2 rounded-full shadow"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <SparklesIcon className="w-4 h-4" />
+                        Generate AI Description
+                      </>
+                    )}
+                  </button>
+                  {generationError && <p className="text-red-500 text-xs mt-2">{generationError}</p>}
+                </div>
+              )}
+            </div>
             
             {product.variants && product.variants.length > 0 && (
                 <div className="mb-6">
@@ -149,22 +267,22 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
             {/* Actions */}
             <div className="flex items-center gap-4 mt-auto pt-6 border-t dark:border-gray-700">
                 <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
-                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Decrease quantity">
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Decrease quantity" disabled={isOutOfStock}>
                         <MinusIcon className="w-4 h-4" />
                     </button>
                     <span className="px-4 text-lg font-semibold">{quantity}</span>
-                    <button onClick={() => setQuantity(q => q + 1)} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Increase quantity">
+                    <button onClick={() => setQuantity(q => Math.min(currentStock, q + 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Increase quantity" disabled={isOutOfStock || quantity >= currentStock}>
                         <PlusIcon className="w-4 h-4" />
                     </button>
                 </div>
 
                 <button
                     onClick={handleAddToCart}
-                    className="flex-grow flex items-center justify-center bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors shadow-md disabled:opacity-70"
-                    disabled={addedToCart}
+                    className="flex-grow flex items-center justify-center bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isOutOfStock || addedToCart}
                 >
                     <ShoppingCartIcon className="w-6 h-6" />
-                    <span className="ml-2">{addedToCart ? 'Added!' : 'Add to Cart'}</span>
+                    <span className="ml-2">{addedToCart ? 'Added!' : isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
                 </button>
 
                 <button
@@ -186,6 +304,11 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
 
       <ProductReviews product={product} />
       <UserGallery product={product} />
+      <RelatedProducts 
+        currentProduct={product}
+        onProductClick={onProductClick}
+        onQuickViewClick={onQuickViewClick}
+      />
     </div>
   );
 };

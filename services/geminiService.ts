@@ -30,3 +30,33 @@ export const generateImageWithGemini = async (prompt: string): Promise<string> =
     throw new Error("Failed to generate AI image. Please try again.");
   }
 };
+
+export const generateDescriptionWithGemini = async (productName: string, category: string): Promise<string> => {
+  if (!process.env.API_KEY) {
+    throw new Error("API_KEY environment variable not set");
+  }
+
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  const prompt = `Generate a short, engaging, and benefit-focused e-commerce product description for a phone case.
+  - Product Name: "${productName}"
+  - Category/Brand: "${category}"
+  
+  The description should be a single paragraph, approximately 20-30 words long. Focus on the style, vibe, and appeal. Do not use markdown, bullet points, or any special formatting. Just plain text.`;
+
+  try {
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+    });
+    
+    if (response.text) {
+        return response.text.trim();
+    } else {
+        throw new Error("The AI did not return a description.");
+    }
+  } catch (error) {
+    console.error("Error generating description with Gemini:", error);
+    throw new Error("Failed to generate AI description. Please try again.");
+  }
+};

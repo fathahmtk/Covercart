@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const PencilIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+export const ArchiveBoxIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
     <svg 
         className={className} 
         fill="none" 
@@ -13,7 +13,7 @@ export const PencilIcon: React.FC<{ className?: string }> = ({ className = "w-5 
             strokeLinecap="round" 
             strokeLinejoin="round" 
             strokeWidth={2} 
-            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" 
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" 
         />
     </svg>
 );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Product, Review } from '../types';
+import { Product } from '../types';
 import { useReviews } from '../context/ReviewsContext';
 import { XMarkIcon } from './icons/XMarkIcon';
 import StarRating from './StarRating';
