@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
 
@@ -67,7 +68,7 @@ const Hero: React.FC = () => {
               />
             );
          })}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent" aria-hidden="true"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" aria-hidden="true"></div>
       </div>
       
       <div className="relative z-10 container mx-auto px-6 text-center">
@@ -78,7 +79,7 @@ const Hero: React.FC = () => {
         </div>
         <div className="opacity-0 animate-slide-in-bottom" style={{ animationDelay: '0.5s' }}>
             <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto drop-shadow-lg font-light text-gray-200">
-              From runway trends to your own AI creations, find the perfect case that's uniquely you.
+              From runway trends to timeless classics, find the perfect case that's uniquely you.
             </p>
         </div>
         <div className="opacity-0 animate-slide-in-bottom flex flex-wrap justify-center gap-4" style={{ animationDelay: '0.8s' }}>
@@ -87,12 +88,6 @@ const Hero: React.FC = () => {
             className="bg-white text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 shadow-lg"
           >
             Explore Collection
-          </a>
-          <a 
-            href="#ai-designer" 
-            className="bg-gradient-to-r from-[--color-primary] to-teal-400 text-white font-bold py-3 px-8 rounded-full hover:shadow-xl hover:from-[--color-primary-hover] hover:to-teal-500 transition-all transform hover:scale-105 shadow-lg"
-          >
-            Design with AI
           </a>
         </div>
       </div>

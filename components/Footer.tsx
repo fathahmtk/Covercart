@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BUSINESS_INFO } from '../constants';
 import { LogoIcon } from './icons/LogoIcon';
@@ -39,7 +40,7 @@ const Footer: React.FC = () => {
                 <span style={{fontFamily: 'var(--font-heading)'}}>{BUSINESS_INFO.name}</span>
             </a>
             <p className="mt-4 text-sm text-gray-400">
-              Style That Speaks. From runway trends to your own AI creations, find the perfect case that's uniquely you.
+              Style That Speaks. From runway trends to timeless classics, find the perfect case that's uniquely you.
             </p>
             <div className="flex space-x-4 mt-6">
                 <a href="https://www.facebook.com/share/1BkAG3Qvm8/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Facebook">
@@ -59,7 +60,6 @@ const Footer: React.FC = () => {
             <h5 className="font-bold text-white uppercase tracking-wider">Quick Links</h5>
             <ul className="mt-4 space-y-2">
               <li><a href="#products" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Collection</a></li>
-              <li><a href="#ai-designer" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">AI Designer</a></li>
               <li><a href="#about" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">About Us</a></li>
               <li><a href="#contact" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Contact</a></li>
             </ul>

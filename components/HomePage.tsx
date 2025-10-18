@@ -1,7 +1,7 @@
+
 import React, { useMemo } from 'react';
 import Hero from './Hero';
 import ProductList from './ProductList';
-import AiDesigner from './AiDesigner';
 import About from './About';
 import Contact from './Contact';
 import { Product } from '../types';
@@ -61,7 +61,6 @@ const HomePage: React.FC<HomePageProps> = ({ searchQuery, onProductClick, onQuic
         onProductClick={onProductClick} 
         onQuickViewClick={onQuickViewClick}
       />
-      <AiDesigner />
       <About />
       <Contact />
     </>

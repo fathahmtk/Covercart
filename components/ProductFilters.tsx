@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CheckIcon } from './icons/CheckIcon';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
@@ -82,7 +83,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   };
 
   return (
-    <div className="bg-[--color-bg] p-6 rounded-lg mb-12 shadow-md border border-[--color-border]">
+    <div className="bg-[--color-bg] p-6 rounded-lg mb-12 shadow-[var(--shadow-elevation-low)] border border-[--color-border]">
       {/* Top Row: Title & Sorting */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
         <h3 className="text-2xl font-bold text-[--color-text]">Filters</h3>
@@ -166,7 +167,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
         </p>
         <button
           onClick={onReset}
-          className="text-sm font-semibold text-white bg-[--color-primary] hover:bg-[--color-primary-hover] px-4 py-2 rounded-full transition-colors shadow-sm"
+          className="text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-full transition-colors border border-gray-300 dark:border-gray-600"
         >
           Reset Filters
         </button>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { CATEGORIES, SORT_OPTIONS } from '../constants';
 import ProductCard from './ProductCard';
@@ -183,7 +184,7 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
             <button
               onClick={handlePrevPage}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-[--color-bg] border border-[--color-border] rounded-md shadow-sm text-sm font-medium text-[--color-text] hover:bg-[--color-bg-subtle] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-transparent border border-[--color-primary] text-[--color-primary] rounded-md shadow-sm text-sm font-medium hover:bg-[--color-primary] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               &larr; Previous
             </button>
@@ -193,7 +194,7 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
             <button
               onClick={handleNextPage}
               disabled={currentPage >= totalPages}
-              className="px-4 py-2 bg-[--color-bg] border border-[--color-border] rounded-md shadow-sm text-sm font-medium text-[--color-text] hover:bg-[--color-bg-subtle] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-transparent border border-[--color-primary] text-[--color-primary] rounded-md shadow-sm text-sm font-medium hover:bg-[--color-primary] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Next &rarr;
             </button>

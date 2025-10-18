@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { Product } from '../types';
 import ProductCard from './ProductCard';
@@ -40,7 +41,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ title, products, onPr
         <div className="relative group">
           <button
             onClick={() => scroll('left')}
-            className="absolute top-1/2 -left-4 -translate-y-1/2 z-10 p-2 bg-white/80 dark:bg-gray-800/80 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 disabled:opacity-0"
+            className="absolute top-1/2 -left-4 -translate-y-1/2 z-10 p-3 bg-white/80 dark:bg-gray-800/80 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 disabled:opacity-0"
             aria-label="Scroll left"
           >
             <ChevronLeftIcon className="w-6 h-6 text-gray-800 dark:text-white" />
@@ -48,7 +49,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ title, products, onPr
           
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto pb-4 scroll-smooth scroll-p-6 snap-x snap-mandatory"
+            className="flex gap-6 overflow-x-auto pb-4 px-4 -mx-4 scroll-smooth scroll-p-6 snap-x snap-mandatory"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {products.map((product, index) => (
@@ -68,7 +69,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ title, products, onPr
           
           <button
             onClick={() => scroll('right')}
-            className="absolute top-1/2 -right-4 -translate-y-1/2 z-10 p-2 bg-white/80 dark:bg-gray-800/80 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 disabled:opacity-0"
+            className="absolute top-1/2 -right-4 -translate-y-1/2 z-10 p-3 bg-white/80 dark:bg-gray-800/80 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 disabled:opacity-0"
             aria-label="Scroll right"
           >
             <ChevronRightIcon className="w-6 h-6 text-gray-800 dark:text-white" />

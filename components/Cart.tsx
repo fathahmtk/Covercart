@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useOrders } from '../context/OrderContext';
@@ -180,7 +181,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                 <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">Subtotal</span>
                 <span className="text-2xl font-bold text-gray-800 dark:text-white">₹{cartTotal}</span>
               </div>
-              <button onClick={handleCheckout} className="w-full flex items-center justify-center bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition-colors shadow">
+              <button onClick={handleCheckout} className="w-full flex items-center justify-center bg-green-600 text-white font-bold py-4 px-6 rounded-lg hover:bg-green-700 transition-transform transform hover:scale-[1.02] shadow-lg hover:shadow-green-500/40">
                 Proceed to Checkout
               </button>
               <button

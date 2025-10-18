@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product, ProductVariant } from '../types';
 import { useCart } from '../context/CartContext';
@@ -13,8 +14,6 @@ import { CheckIcon } from './icons/CheckIcon';
 import ImageZoom from './ImageZoom';
 import LazyImage from './LazyImage';
 import UserGallery from './UserGallery';
-import { generateDescriptionWithGemini } from '../services/geminiService';
-import { SparklesIcon } from './icons/SparklesIcon';
 import RelatedProducts from './RelatedProducts';
 import { useSEO } from '../hooks/useSEO';
 import Lightbox from './Lightbox';
@@ -45,10 +44,6 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
       );
   const [mainImage, setMainImage] = useState(product.imageUrl);
   const [quantity, setQuantity] = useState(1);
-  
-  const [aiDescription, setAiDescription] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationError, setGenerationError] = useState<string | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
   const { average, count } = getAverageRating(product.id);
@@ -104,9 +99,6 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
     setSelectedVariant(initialVariant);
     setMainImage(initialVariant ? initialVariant.imageUrl : product.imageUrl);
     setQuantity(1);
-    setAiDescription(null);
-    setIsGenerating(false);
-    setGenerationError(null);
     setIsLightboxOpen(false); // Close lightbox when product changes
   }, [product]);
 
@@ -138,19 +130,6 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
       removeFromWishlist(product.id);
     } else {
       addToWishlist(product);
-    }
-  };
-  
-  const handleGenerateDescription = async () => {
-    setIsGenerating(true);
-    setGenerationError(null);
-    try {
-        const description = await generateDescriptionWithGemini(product.name, product.category);
-        setAiDescription(description);
-    } catch (error) {
-        setGenerationError(error instanceof Error ? error.message : "An unknown error occurred.");
-    } finally {
-        setIsGenerating(false);
     }
   };
 
@@ -241,35 +220,8 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
                 <StockIndicator />
             </div>
 
-            <div className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6 min-h-[4.5rem]">
-              {aiDescription || product.description ? (
-                <p>{aiDescription || product.description}</p>
-              ) : (
-                <div>
-                  <p className="italic text-gray-400 dark:text-gray-500">No description available for this product.</p>
-                  <button
-                    onClick={handleGenerateDescription}
-                    disabled={isGenerating}
-                    className="mt-2 flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-[--color-primary] to-teal-400 hover:shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-wait px-4 py-2 rounded-full shadow"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <SparklesIcon className="w-4 h-4" />
-                        Generate AI Description
-                      </>
-                    )}
-                  </button>
-                  {generationError && <p className="text-red-500 text-xs mt-2">{generationError}</p>}
-                </div>
-              )}
+            <div className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+              <p>{product.description}</p>
             </div>
             
             {product.variants && product.variants.length > 0 && (
@@ -299,18 +251,18 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
             {/* Actions */}
             <div className="flex items-center gap-4">
                 <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
-                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Decrease quantity" disabled={isOutOfStock}>
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-4 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Decrease quantity" disabled={isOutOfStock}>
                         <MinusIcon className="w-4 h-4" />
                     </button>
                     <span className="px-4 text-lg font-semibold">{quantity}</span>
-                    <button onClick={() => setQuantity(q => Math.min(currentStock, q + 1))} className="p-3 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Increase quantity" disabled={isOutOfStock || quantity >= currentStock}>
+                    <button onClick={() => setQuantity(q => Math.min(currentStock, q + 1))} className="p-4 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Increase quantity" disabled={isOutOfStock || quantity >= currentStock}>
                         <PlusIcon className="w-4 h-4" />
                     </button>
                 </div>
 
                 <button
                     onClick={handleAddToCart}
-                    className="flex-grow flex items-center justify-center bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-grow flex items-center justify-center bg-gray-800 text-white font-bold py-4 px-8 text-lg rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isOutOfStock}
                 >
                     <ShoppingCartIcon className="w-6 h-6" />
@@ -334,10 +286,10 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
             <div className="mt-6 pt-6 border-t dark:border-gray-700 flex items-center gap-4">
                 <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Share:</span>
                 <div className="flex items-center gap-2">
-                    <button onClick={() => handleShare('whatsapp')} className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Share on WhatsApp"><WhatsAppIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" /></button>
-                    <button onClick={() => handleShare('facebook')} className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Share on Facebook"><FacebookIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" /></button>
-                    <button onClick={() => handleShare('twitter')} className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Share on Twitter"><TwitterIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" /></button>
-                    <button onClick={() => handleShare('copy')} className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Copy link"><LinkIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" /></button>
+                    <button onClick={() => handleShare('whatsapp')} className="p-2 rounded-full bg-transparent border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-[--color-primary] transition-colors" aria-label="Share on WhatsApp"><WhatsAppIcon className="w-5 h-5" /></button>
+                    <button onClick={() => handleShare('facebook')} className="p-2 rounded-full bg-transparent border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-[--color-primary] transition-colors" aria-label="Share on Facebook"><FacebookIcon className="w-5 h-5" /></button>
+                    <button onClick={() => handleShare('twitter')} className="p-2 rounded-full bg-transparent border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-[--color-primary] transition-colors" aria-label="Share on Twitter"><TwitterIcon className="w-5 h-5" /></button>
+                    <button onClick={() => handleShare('copy')} className="p-2 rounded-full bg-transparent border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-[--color-primary] transition-colors" aria-label="Copy link"><LinkIcon className="w-5 h-5" /></button>
                 </div>
             </div>
           </div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { generateImageWithGemini } from '../services/geminiService';
 import { SparklesIcon } from './icons/SparklesIcon';
@@ -34,7 +35,7 @@ const AiDesigner: React.FC = () => {
   const PhoneFrame: React.FC<{ model: PhoneModel; children: React.ReactNode }> = ({ model, children }) => {
     // Base classes for the phone's outer chassis
     let frameClasses = "relative w-48 h-96 bg-gray-800 dark:bg-gray-900 shadow-2xl transition-all duration-300 flex items-center justify-center p-1.5";
-    let screenClasses = "relative w-full h-full bg-black overflow-hidden flex items-center justify-center";
+    let screenClasses = "relative w-full h-full bg-black overflow-hidden flex items-center justify-center shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)]";
     let cameraCutout = null;
     let sideButtons = null;
 
@@ -115,7 +116,7 @@ const AiDesigner: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-10 items-center justify-center">
             {/* Controls */}
             <div className="w-full lg:w-1/2">
-              <div className="bg-[--color-bg] p-8 rounded-xl shadow-lg border border-[--color-border]">
+              <div className="bg-[--color-bg] p-8 rounded-xl shadow-[var(--shadow-elevation-medium)] border border-[--color-border]">
                 <label htmlFor="ai-prompt" className="block text-lg font-semibold mb-2 text-[--color-text]">
                   What's your vision?
                 </label>

@@ -48,8 +48,8 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
   };
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[--color-bg]/80 dark:bg-[--color-bg]/80 backdrop-blur-xl border-b border-[--color-border]/50 shadow-sm' : 'bg-transparent'}`}>
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center relative">
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[--color-bg]/80 dark:bg-[--color-bg]/80 backdrop-blur-2xl border-b border-[--color-border]/50 shadow-[var(--shadow-elevation-low)]' : 'bg-transparent'}`}>
+      <nav className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center relative">
 
         {/* --- Main Header Content --- */}
         <div className="flex items-center space-x-8">
@@ -59,7 +59,6 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
             </a>
             <div className="hidden md:flex items-center space-x-6">
                 <a href="#products" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Products</a>
-                <a href="#ai-designer" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">AI Designer</a>
                 <a href="#about" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">About</a>
                 <a href="#contact" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Contact</a>
             </div>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
@@ -63,7 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
 
   return (
     <div 
-      className="bg-[--color-bg] rounded-xl shadow-lg hover:shadow-2xl overflow-hidden border border-[--color-border] h-full flex flex-col transition-all duration-300 group"
+      className="bg-[--color-bg] rounded-xl shadow-[var(--shadow-elevation-low)] hover:shadow-[var(--shadow-elevation-medium)] overflow-hidden border border-[--color-border] h-full flex flex-col transition-all duration-300 group hover:-translate-y-1"
     >
       <div className="relative overflow-hidden">
         <button onClick={() => onProductClick(product)} className="w-full block">
@@ -117,7 +118,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
           <button 
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className="flex items-center gap-2 bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCartIcon className="w-5 h-5"/>
             <span>{hasVariants ? 'Select Options' : 'Add to Cart'}</span>

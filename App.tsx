@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -43,9 +44,9 @@ const App: React.FC = () => {
   };
 
   useSEO({
-    title: 'covercove.com - AI & Designer Mobile Covers and Cases',
-    description: 'Discover a stunning collection of mobile covers or design your own with AI. High-quality cases for Apple, Samsung, Google, and more.',
-    keywords: 'mobile cover, phone case, ai design, custom phone case, samsung case, apple iphone cover',
+    title: 'covercove.com - Designer Mobile Covers and Cases',
+    description: 'Discover a stunning collection of mobile covers. High-quality cases for Apple, Samsung, Google, and more.',
+    keywords: 'mobile cover, phone case, designer phone case, custom phone case, samsung case, apple iphone cover',
     schema: organizationSchema,
   });
 
