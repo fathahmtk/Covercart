@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import LazyImage from './LazyImage';
 
@@ -88,11 +89,11 @@ const ImageZoom: React.FC<ImageZoomProps> = ({ imageUrl, alt }) => {
         key={imageUrl}
         src={imageUrl}
         alt={alt}
-        className="w-full h-auto object-cover transition-transform duration-200 ease-out"
+        className="w-full h-auto object-cover transition-transform duration-300 ease-out"
         placeholderClassName="w-full h-auto"
         style={{
           aspectRatio: '1/1.5',
-          transform: showZoom ? 'scale(3)' : 'scale(1)', // Increased zoom level
+          transform: showZoom ? 'scale(2)' : 'scale(1)',
           transformOrigin: `${position.x}% ${position.y}%`,
         }}
         onLoad={() => setIsImageLoaded(true)}

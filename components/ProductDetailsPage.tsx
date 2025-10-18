@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Product, ProductVariant } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -36,8 +36,10 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   const { getAverageRating } = useReviews();
   const { showToast } = useToast();
   
-  const allImages = product.variants ? [product.imageUrl, ...product.variants.map(v => v.imageUrl)] : [product.imageUrl];
-  const uniqueImages = [...new Set(allImages)];
+  const uniqueImages = useMemo(() => {
+    const allImages = product.variants ? [product.imageUrl, ...product.variants.map(v => v.imageUrl)] : [product.imageUrl];
+    return [...new Set(allImages)];
+  }, [product]);
   
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
       product.variants && product.variants.length > 0 ? product.variants[0] : null
@@ -180,6 +182,11 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
     return <div className="px-3 py-1 text-sm font-bold text-green-800 bg-green-100 rounded-full inline-block">In Stock</div>;
   };
 
+  const lightboxInitialIndex = useMemo(() => {
+    const index = uniqueImages.findIndex(img => img === mainImage);
+    return index >= 0 ? index : 0;
+  }, [mainImage, uniqueImages]);
+
   return (
     <div className="animate-fade-in">
       <div className="container mx-auto px-6 py-12">
@@ -305,7 +312,11 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
         onQuickViewClick={onQuickViewClick}
       />
       {isLightboxOpen && (
-        <Lightbox imageUrl={mainImage} onClose={() => setIsLightboxOpen(false)} />
+        <Lightbox 
+            images={uniqueImages} 
+            initialIndex={lightboxInitialIndex} 
+            onClose={() => setIsLightboxOpen(false)} 
+        />
       )}
       <ReviewsModal
         isOpen={isReviewsModalOpen}

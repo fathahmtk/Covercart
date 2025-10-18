@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
@@ -5,24 +6,24 @@ import { ChevronRightIcon } from './icons/ChevronRightIcon';
 
 const heroImages = [
   {
-    id: '1604076913837-52ab5629fba9',
-    alt: 'A phone case with a sleek, dark, abstract textured design.'
+    id: '1603715454235-5026f12204a1',
+    alt: 'A stylish phone with an elegant white and gold marble case.'
   },
   {
     id: '1512499617640-b74ae3e7db25',
     alt: 'A stylish flat lay with a phone in a case, sunglasses, and notebook on a pink background.'
   },
   {
+    id: '1574281591321-4f68a2d1e1c9',
+    alt: 'A phone with a vibrant synthwave retro sunset case.'
+  },
+  {
     id: '1610792516307-ea5acd9c3b00',
     alt: 'A person holding a phone with a modern, artistic case against a textured wall.'
   },
   {
-    id: '1598327105553-6939ef417205',
-    alt: 'A phone with an elegant case on a minimalist desk with a keyboard and plant.'
-  },
-  {
-    id: '1579546929518-9e396f3cc809',
-    alt: 'A vibrant and colorful abstract gradient phone case design.'
+    id: '1599582301353-53303c621122',
+    alt: 'A close-up of a sleek and modern carbon fiber phone case.'
   }
 ];
 
