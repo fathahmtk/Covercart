@@ -9,8 +9,8 @@ const Hero: React.FC = () => {
     >
       <div className="absolute inset-0 z-0">
          <img 
-            src="https://images.unsplash.com/photo-1684348021049-79721404c554?q=80&w=1920&auto=format&fit=crop" 
-            alt="AI-generated graphic of a woman with vibrant, abstract digital art elements"
+            src="https://images.unsplash.com/photo-1677756119517-756a188d2d94?q=80&w=1920&auto=format&fit=crop" 
+            alt="AI-generated image of a stylish model with futuristic neon lighting"
             className="w-full h-full object-cover object-center animate-fade-in"
          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent" aria-hidden="true"></div>
