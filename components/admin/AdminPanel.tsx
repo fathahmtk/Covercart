@@ -11,8 +11,12 @@ import { ArrowUpIcon } from '../icons/ArrowUpIcon';
 import { ArrowDownIcon } from '../icons/ArrowDownIcon';
 import { ArchiveBoxIcon } from '../icons/ArchiveBoxIcon';
 import { ClipboardListIcon } from '../icons/ClipboardListIcon';
+import { CATEGORIES } from '../../constants';
 
 type SortConfig<T> = { key: keyof T; direction: 'asc' | 'desc' } | null;
+type ProductSortKeys = 'name' | 'category' | 'price' | 'stock';
+
+const ITEMS_PER_PAGE = 10;
 
 const AdminPanel: React.FC = () => {
   // Authentication State
@@ -29,7 +33,13 @@ const AdminPanel: React.FC = () => {
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [productSortConfig, setProductSortConfig] = useState<SortConfig<Product>>(null);
+  
+  // New states for filtering, sorting, and pagination
+  const [productSortConfig, setProductSortConfig] = useState<SortConfig<Product> | { key: ProductSortKeys; direction: 'asc' | 'desc' } | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState('All');
+  const [stockFilter, setStockFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+
 
   // Orders State
   const { orders, updateOrderStatus } = useOrders();
@@ -43,7 +53,7 @@ const AdminPanel: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin123') { // Hardcoded password
+    if (password === 'Admin password') { // Hardcoded password
       sessionStorage.setItem('isAdminAuthenticated', 'true');
       setIsAuth(true);
     } else {
@@ -51,26 +61,77 @@ const AdminPanel: React.FC = () => {
     }
   };
 
-  // Generic sort function
-  const sortedItems = <T,>(items: T[], sortConfig: SortConfig<T>): T[] => {
-    if (!sortConfig) return items;
-    return [...items].sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-    });
-  };
-
-  const requestSort = <T,>(key: keyof T, sortConfig: SortConfig<T>, setSortConfig: React.Dispatch<React.SetStateAction<SortConfig<T>>>) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-        direction = 'desc';
-    }
-    setSortConfig({ key, direction });
+  const getProductStock = (product: Product): number => {
+    return product.variants && product.variants.length > 0
+      ? product.variants.reduce((sum, v) => sum + v.stock, 0)
+      : product.stock ?? 0;
   };
   
-  const sortedProducts = useMemo(() => sortedItems(products, productSortConfig), [products, productSortConfig]);
-  const sortedOrders = useMemo(() => sortedItems(orders, orderSortConfig), [orders, orderSortConfig]);
+  const getStockStatus = (stock: number) => {
+      if (stock <= 0) return 'Out of Stock';
+      if (stock <= 5) return 'Low Stock';
+      return 'In Stock';
+  };
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+        const categoryMatch = categoryFilter === 'All' || product.category === categoryFilter;
+        const stockStatus = getStockStatus(getProductStock(product));
+        const stockMatch = stockFilter === 'All' || stockStatus === stockFilter;
+        return categoryMatch && stockMatch;
+    });
+  }, [products, categoryFilter, stockFilter]);
+
+  const sortedProducts = useMemo(() => {
+    if (!productSortConfig) return filteredProducts;
+    
+    return [...filteredProducts].sort((a, b) => {
+        const key = productSortConfig.key as ProductSortKeys;
+        let aValue: string | number;
+        let bValue: string | number;
+
+        if (key === 'stock') {
+            aValue = getProductStock(a);
+            bValue = getProductStock(b);
+        } else {
+            aValue = a[key as keyof Product] as string | number;
+            bValue = b[key as keyof Product] as string | number;
+        }
+
+        if (aValue < bValue) return productSortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return productSortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+  }, [filteredProducts, productSortConfig]);
+
+  // Reset page to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFilter, stockFilter]);
+
+  const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sortedProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [sortedProducts, currentPage]);
+
+
+  const requestProductSort = (key: ProductSortKeys) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (productSortConfig && productSortConfig.key === key && productSortConfig.direction === 'asc') {
+        direction = 'desc';
+    }
+    setProductSortConfig({ key, direction });
+  };
+  
+  const sortedOrders = useMemo(() => {
+    if (!orderSortConfig) return orders;
+    return [...orders].sort((a, b) => {
+        if (a[orderSortConfig.key] < b[orderSortConfig.key]) return orderSortConfig.direction === 'asc' ? -1 : 1;
+        if (a[orderSortConfig.key] > b[orderSortConfig.key]) return orderSortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+  }, [orders, orderSortConfig]);
 
   // Product actions
   const handleOpenAddModal = () => { setProductToEdit(null); setIsProductModalOpen(true); };
@@ -83,14 +144,18 @@ const AdminPanel: React.FC = () => {
   };
   
   const getStockDisplay = (product: Product) => {
-    const totalStock = product.variants && product.variants.length > 0 
-      ? product.variants.reduce((sum, v) => sum + v.stock, 0)
-      : product.stock ?? 0;
+    const totalStock = getProductStock(product);
+    const status = getStockStatus(totalStock);
     
-    if (totalStock <= 0) return <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Out of Stock</span>;
-    if (totalStock <= 5) return <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Low Stock ({totalStock})</span>;
+    if (status === 'Out of Stock') return <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Out of Stock</span>;
+    if (status === 'Low Stock') return <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Low Stock ({totalStock})</span>;
     return <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">In Stock ({totalStock})</span>;
   }
+  
+  const SortIndicator = ({ sortKey }: { sortKey: ProductSortKeys }) => {
+    if (!productSortConfig || productSortConfig.key !== sortKey) return null;
+    return productSortConfig.direction === 'asc' ? <ArrowUpIcon /> : <ArrowDownIcon />;
+  };
 
   if (!isAuth) {
     return (
@@ -132,22 +197,52 @@ const AdminPanel: React.FC = () => {
           </button>
         </nav>
       </div>
+      
+      {activeTab === 'products' && (
+        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg flex flex-wrap items-center gap-4">
+            <div className="flex-grow">
+                <label htmlFor="category-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                <select id="category-filter" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600">
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+            </div>
+            <div className="flex-grow">
+                <label htmlFor="stock-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">Stock Status</label>
+                <select id="stock-filter" value={stockFilter} onChange={e => setStockFilter(e.target.value)} className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600">
+                    <option value="All">All</option>
+                    <option value="In Stock">In Stock</option>
+                    <option value="Low Stock">Low Stock</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                </select>
+            </div>
+        </div>
+      )}
+
 
       {/* Content */}
       <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-x-auto border dark:border-gray-700">
         {activeTab === 'products' ? (
+          <>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <button onClick={() => requestProductSort('name')} className="flex items-center gap-1">Product <SortIndicator sortKey="name" /></button>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <button onClick={() => requestProductSort('category')} className="flex items-center gap-1">Category <SortIndicator sortKey="category" /></button>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <button onClick={() => requestProductSort('price')} className="flex items-center gap-1">Price <SortIndicator sortKey="price" /></button>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <button onClick={() => requestProductSort('stock')} className="flex items-center gap-1">Stock <SortIndicator sortKey="stock" /></button>
+                </th>
                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {sortedProducts.map((product) => (
+              {paginatedProducts.map((product) => (
                 <tr key={product.id}>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="flex items-center"><div className="flex-shrink-0 h-10 w-10"><img className="h-10 w-10 rounded-md object-cover" src={product.imageUrl} alt={product.name} /></div><div className="ml-4"><div className="text-sm font-medium text-gray-900 dark:text-white">{product.name}</div></div></div></td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{product.category}</td>
@@ -158,6 +253,33 @@ const AdminPanel: React.FC = () => {
               ))}
             </tbody>
           </table>
+          {/* Pagination for Products */}
+          {totalPages > 1 && (
+            <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+                <div className="flex-1 flex justify-between sm:hidden">
+                    <button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">Previous</button>
+                    <button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages} className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">Next</button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                            Showing <span className="font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, sortedProducts.length)}</span> of <span className="font-medium">{sortedProducts.length}</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                                Previous
+                            </button>
+                             <button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages} className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                                Next
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+           )}
+          </>
         ) : (
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
              <thead className="bg-gray-50 dark:bg-gray-700">
