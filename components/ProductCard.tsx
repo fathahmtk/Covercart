@@ -23,7 +23,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
   const { average, count } = getAverageRating(product.id);
   const isInWishlist = isItemInWishlist(product.id);
   
-  const totalStock = product.variants && product.variants.length > 0 
+  const hasVariants = product.variants && product.variants.length > 0;
+  
+  const totalStock = hasVariants
     ? product.variants.reduce((sum, v) => sum + v.stock, 0)
     : product.stock ?? 0;
   
@@ -40,12 +42,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!isOutOfStock) {
-      // If product has variants, add the first one by default.
-      // The quick view or product page will let them choose a specific one.
-      const variantToAdd = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
-      addToCart(product, variantToAdd, 1);
-      // Optional: Add some user feedback like a toast notification
+    if (isOutOfStock) {
+      return;
+    }
+
+    if (hasVariants) {
+      // For products with variants, open the quick view modal for selection.
+      onQuickViewClick(product);
+    } else {
+      // For products without variants, add directly to the cart.
+      addToCart(product, undefined, 1);
+      // TODO: Implement a visual feedback like a toast notification.
     }
   };
 
@@ -113,7 +120,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
             className="flex items-center gap-2 bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-black dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCartIcon className="w-5 h-5"/>
-            <span>Add</span>
+            <span>{hasVariants ? 'Select Options' : 'Add to Cart'}</span>
           </button>
         </div>
       </div>
