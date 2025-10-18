@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
         <button onClick={() => onProductClick(product)} className="w-full block">
           <LazyImage 
             src={product.imageUrl} 
-            alt={product.name} 
+            alt={`${product.name} - ${product.category} Case`} 
             className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
           />
         </button>

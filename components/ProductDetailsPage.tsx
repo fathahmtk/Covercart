@@ -104,7 +104,8 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   }, [product]);
 
   const isInWishlist = isItemInWishlist(product.id);
-  const imageAltText = `${product.name} for ${product.category}`;
+  const imageAltText = `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''}`;
+  const thumbnailAltText = `${product.name} for ${product.category}`;
 
   const handleVariantSelect = (variant: ProductVariant) => {
     setSelectedVariant(variant);
@@ -187,7 +188,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
                   onClick={() => handleThumbnailClick(imgUrl)}
                   className={`rounded-md overflow-hidden transition-all duration-200 aspect-square ${mainImage === imgUrl ? 'ring-2 ring-teal-500 ring-offset-2' : 'hover:opacity-80'}`}
                 >
-                  <LazyImage src={imgUrl} alt={`${imageAltText} thumbnail`} className="w-full h-full object-cover" />
+                  <LazyImage src={imgUrl} alt={`${thumbnailAltText} thumbnail`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
