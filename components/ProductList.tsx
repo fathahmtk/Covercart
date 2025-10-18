@@ -5,6 +5,7 @@ import { Product } from '../types';
 import ProductFilters from './ProductFilters';
 import { useProducts } from '../context/ProductContext';
 import AnimateOnScroll from './AnimateOnScroll';
+import ProductCardSkeleton from './ProductCardSkeleton';
 
 interface ProductListProps {
   searchQuery: string;
@@ -15,7 +16,7 @@ interface ProductListProps {
 const ITEMS_PER_PAGE = 9; // Using 9 for a balanced 3-column grid layout
 
 const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, onQuickViewClick }) => {
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
   
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
@@ -146,7 +147,13 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
             />
         </AnimateOnScroll>
         
-        {paginatedProducts.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : paginatedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             {paginatedProducts.map((product, index) => (
               <AnimateOnScroll key={product.id} delay={index * 100} className="fade-in-up h-full">
@@ -170,7 +177,7 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
           </div>
         )}
 
-        {totalPages > 1 && (
+        {!loading && totalPages > 1 && (
           <AnimateOnScroll className="fade-in-up mt-16 flex justify-center items-center gap-4">
             <button
               onClick={handlePrevPage}

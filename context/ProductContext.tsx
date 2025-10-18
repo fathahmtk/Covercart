@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Product } from '../types';
 import { MOCK_PRODUCTS } from '../constants';
 
@@ -6,6 +6,7 @@ const PRODUCTS_STORAGE_KEY = 'covercart-products';
 
 interface ProductContextType {
   products: Product[];
+  loading: boolean;
   addProduct: (product: Product) => void;
   updateProduct: (updatedProduct: Product) => void;
   deleteProduct: (productId: number) => void;
@@ -30,7 +31,19 @@ const loadProductsFromStorage = (): Product[] => {
 };
 
 export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>(loadProductsFromStorage);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    // Simulate initial data fetch to allow skeleton loaders to be displayed
+    const timer = setTimeout(() => {
+      setProducts(loadProductsFromStorage());
+      setLoading(false);
+    }, 800); // Simulate network delay
+
+    return () => clearTimeout(timer);
+  }, []);
+
 
   const saveProductsToStorage = (productsToSave: Product[]) => {
      try {
@@ -60,6 +73,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const value = {
     products,
+    loading,
     addProduct,
     updateProduct,
     deleteProduct

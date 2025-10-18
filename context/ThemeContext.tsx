@@ -11,16 +11,15 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Check for saved theme in localStorage, otherwise check system preference
+    // Check for saved theme in localStorage, otherwise default to dark.
     if (typeof window !== 'undefined' && window.localStorage) {
       const storedTheme = window.localStorage.getItem('theme') as Theme;
       if (storedTheme) {
         return storedTheme;
       }
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-    // Default for server-side rendering or environments without localStorage
-    return 'light';
+    // Default to 'dark'
+    return 'dark';
   });
 
   useEffect(() => {

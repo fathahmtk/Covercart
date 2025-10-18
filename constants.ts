@@ -2,8 +2,8 @@ import { Product } from './types';
 
 export const BUSINESS_INFO = {
   name: 'CoverCart',
-  address: 'New Delhi, India',
-  phone: '+91 12345 67890',
+  address: 'Kerala, India',
+  phone: '+91 96334 94381',
   whatsappMessage: "Hello! I'm interested in your phone cases.",
 };
 

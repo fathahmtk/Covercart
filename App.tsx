@@ -10,6 +10,9 @@ import HomePage from './components/HomePage';
 import AdminPanel from './components/admin/AdminPanel';
 import { useProducts } from './context/ProductContext';
 import { useDebounce } from './hooks/useDebounce';
+import PrivacyPolicyPage from './components/legal/PrivacyPolicyPage';
+import TermsOfServicePage from './components/legal/TermsOfServicePage';
+import RefundPolicyPage from './components/legal/RefundPolicyPage';
 
 const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -64,6 +67,18 @@ const App: React.FC = () => {
 
     if (currentPath === '#/admin') {
       return <AdminPanel />;
+    }
+    
+    if (currentPath === '#/privacy') {
+      return <PrivacyPolicyPage onBack={handleBackToList} />;
+    }
+    
+    if (currentPath === '#/terms') {
+      return <TermsOfServicePage onBack={handleBackToList} />;
+    }
+    
+    if (currentPath === '#/refunds') {
+      return <RefundPolicyPage onBack={handleBackToList} />;
     }
 
     // Default to home page
