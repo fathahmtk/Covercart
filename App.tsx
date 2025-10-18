@@ -1,35 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import ProductList from './components/ProductList';
-import AiDesigner from './components/AiDesigner';
-import About from './components/About';
-import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Cart from './components/Cart';
 import Wishlist from './components/Wishlist';
 import { Product } from './types';
 import ProductDetailsPage from './components/ProductDetailsPage';
-import AddProductModal from './components/AddProductModal';
 import QuickViewModal from './components/QuickViewModal';
+import HomePage from './components/HomePage';
+import AdminPanel from './components/admin/AdminPanel';
+import { useProducts } from './context/ProductContext';
+import { useDebounce } from './hooks/useDebounce';
 
 const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
-  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+  const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce the search query
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [currentPath, setCurrentPath] = useState(window.location.hash || '#/');
+  const { products } = useProducts();
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentPath(window.location.hash || '#/');
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const handleProductClick = (product: Product) => {
-    setViewingProduct(product);
-    window.scrollTo(0, 0); // Scroll to top when viewing a product
+    window.location.hash = `#/product/${product.id}`;
   };
 
   const handleBackToList = () => {
-    setViewingProduct(null);
+    window.location.hash = '#/';
   };
-
+  
   const handleQuickViewOpen = (product: Product) => {
     setQuickViewProduct(product);
   };
@@ -43,6 +50,32 @@ const App: React.FC = () => {
     handleProductClick(product);
   };
 
+  const renderedPage = useMemo(() => {
+    if (currentPath.startsWith('#/product/')) {
+      const productId = parseInt(currentPath.split('/')[2], 10);
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        return <ProductDetailsPage product={product} onBack={handleBackToList} />;
+      }
+      // Fallback if product not found
+      window.location.hash = '#/';
+      return null;
+    }
+
+    if (currentPath === '#/admin') {
+      return <AdminPanel />;
+    }
+
+    // Default to home page
+    return (
+      <HomePage 
+        searchQuery={debouncedSearchQuery}
+        onProductClick={handleProductClick}
+        onQuickViewClick={handleQuickViewOpen}
+      />
+    );
+  }, [currentPath, products, debouncedSearchQuery]);
+
   return (
     <div className="min-h-screen text-gray-800 dark:text-gray-200 font-sans antialiased">
       <Header
@@ -52,27 +85,11 @@ const App: React.FC = () => {
         onSearchChange={setSearchQuery}
       />
       <main>
-        {viewingProduct ? (
-          <ProductDetailsPage product={viewingProduct} onBack={handleBackToList} />
-        ) : (
-          <>
-            <Hero />
-            <ProductList 
-              searchQuery={searchQuery} 
-              onProductClick={handleProductClick} 
-              onAddProductClick={() => setIsAddProductModalOpen(true)}
-              onQuickViewClick={handleQuickViewOpen}
-            />
-            <AiDesigner />
-            <About />
-            <Contact />
-          </>
-        )}
+        {renderedPage}
       </main>
       <Footer />
       <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       <Wishlist isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
-      <AddProductModal isOpen={isAddProductModalOpen} onClose={() => setIsAddProductModalOpen(false)} />
       <QuickViewModal 
         isOpen={!!quickViewProduct} 
         onClose={handleQuickViewClose} 

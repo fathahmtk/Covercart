@@ -132,13 +132,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
   return (
     <div 
         onClick={() => onProductClick(product)}
-        className="cursor-pointer bg-[--color-bg] rounded-xl shadow-md overflow-hidden group transform hover:-translate-y-2 transition-all duration-300 border border-[--color-border] hover:shadow-xl hover:border-[--color-primary]/50 h-full flex flex-col"
+        className="cursor-pointer bg-[--color-bg] rounded-xl shadow-md overflow-hidden group transform hover:-translate-y-2 transition-all duration-300 border border-[--color-border] hover:shadow-2xl hover:shadow-[--color-primary]/20 hover:border-[--color-primary]/50 h-full flex flex-col"
     >
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <LazyImage
           src={displayImageUrl}
           alt={product.name}
-          className="w-full h-64 object-cover"
+          className="w-full h-64 object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
         />
         
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">

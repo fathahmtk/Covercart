@@ -4,23 +4,24 @@ import ProductCard from './ProductCard';
 import { Product } from '../types';
 import ProductFilters from './ProductFilters';
 import { useProducts } from '../context/ProductContext';
-import { PlusCircleIcon } from './icons/PlusCircleIcon';
 import AnimateOnScroll from './AnimateOnScroll';
 
 interface ProductListProps {
   searchQuery: string;
   onProductClick: (product: Product) => void;
-  onAddProductClick: () => void;
   onQuickViewClick: (product: Product) => void;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, onAddProductClick, onQuickViewClick }) => {
+const ITEMS_PER_PAGE = 9; // Using 9 for a balanced 3-column grid layout
+
+const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, onQuickViewClick }) => {
   const { products } = useProducts();
   
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortOption, setSortOption] = useState(SORT_OPTIONS[0].value);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { maxProductPrice, availableColors } = useMemo(() => {
     if (products.length === 0) return { maxProductPrice: 1000, availableColors: [] };
@@ -44,7 +45,8 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
   }, [maxProductPrice]);
 
   const filteredProducts = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim();
+    // Refine query processing: trim, lowercase, and replace multiple spaces with a single one.
+    const query = searchQuery.toLowerCase().trim().replace(/\s+/g, ' ');
     
     const filtered = products.filter(product => {
       const matchesSearch = query ? 
@@ -86,6 +88,18 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
     
     return sorted;
   }, [products, searchQuery, selectedCategory, priceRange, sortOption, selectedColors]);
+
+  // Reset to page 1 when filters or search query change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, priceRange, sortOption, selectedColors]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
   
   const handleResetFilters = () => {
     setSelectedCategory('All');
@@ -94,39 +108,25 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
     setSelectedColors([]);
   };
 
+  const handlePrevPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
   return (
     <section id="products" className="py-24 bg-[--color-bg-subtle]">
       <div className="container mx-auto px-6">
         <AnimateOnScroll className="fade-in-up">
             <div className="text-center mb-4 relative">
                 <h2 className="text-4xl font-bold text-[--color-text] tracking-tight">Our Collection</h2>
-                <div className="absolute top-1/2 -translate-y-1/2 right-0 hidden sm:block">
-                     <button 
-                        onClick={onAddProductClick}
-                        className="flex items-center gap-2 bg-[--color-primary] text-white py-2 px-4 rounded-lg hover:bg-[--color-primary-hover] transition-colors text-sm font-semibold"
-                        title="Add a new product to the catalog"
-                      >
-                        <PlusCircleIcon />
-                        <span>Add Product</span>
-                     </button>
-                </div>
             </div>
 
             <p className="text-center text-[--color-text-muted] mb-12">
               Find the perfect case that matches your style.
             </p>
-
-            <div className="sm:hidden mb-8 text-center">
-                 <button 
-                    onClick={onAddProductClick}
-                    className="inline-flex items-center gap-2 bg-[--color-primary] text-white py-2 px-4 rounded-lg hover:bg-[--color-primary-hover] transition-colors font-semibold"
-                    title="Add a new product to the catalog"
-                  >
-                    <PlusCircleIcon />
-                    <span>Add New Product</span>
-                 </button>
-            </div>
-
 
             <ProductFilters
               categories={CATEGORIES}
@@ -146,9 +146,9 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
             />
         </AnimateOnScroll>
         
-        {filteredProducts.length > 0 ? (
+        {paginatedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {filteredProducts.map((product, index) => (
+            {paginatedProducts.map((product, index) => (
               <AnimateOnScroll key={product.id} delay={index * 100} className="fade-in-up h-full">
                 <ProductCard 
                   product={product} 
@@ -168,6 +168,28 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
               Try adjusting your search or filters to find what you're looking for.
             </p>
           </div>
+        )}
+
+        {totalPages > 1 && (
+          <AnimateOnScroll className="fade-in-up mt-16 flex justify-center items-center gap-4">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-[--color-bg] border border-[--color-border] rounded-md shadow-sm text-sm font-medium text-[--color-text] hover:bg-[--color-bg-subtle] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              &larr; Previous
+            </button>
+            <span className="text-sm text-[--color-text-muted]">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage >= totalPages}
+              className="px-4 py-2 bg-[--color-bg] border border-[--color-border] rounded-md shadow-sm text-sm font-medium text-[--color-text] hover:bg-[--color-bg-subtle] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next &rarr;
+            </button>
+          </AnimateOnScroll>
         )}
       </div>
     </section>

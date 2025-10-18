@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 
-interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+// Fix: Omitted 'src' from ImgHTMLAttributes and defined it to accept string or Blob.
+interface LazyImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+  src?: string | Blob;
   placeholderClassName?: string;
   onLoad?: () => void;
 }
@@ -15,7 +17,14 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className, placeholderC
 
   useEffect(() => {
     if (isVisible && !imageSrc) {
-      setImageSrc(src);
+      // Fix: Improved type checking to handle string and Blob sources explicitly.
+      // This ensures that only a string (either the original src or a new object URL)
+      // is passed to setImageSrc, resolving the type error.
+      if (typeof src === 'string') {
+        setImageSrc(src);
+      } else if (src instanceof Blob) {
+        setImageSrc(URL.createObjectURL(src));
+      }
     }
   }, [isVisible, src, imageSrc]);
   

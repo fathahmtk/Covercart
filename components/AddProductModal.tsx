@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { Product, ProductVariant } from '../types';
 import { CATEGORIES } from '../constants';
@@ -10,18 +10,32 @@ import { XCircleIcon } from './icons/XCircleIcon';
 interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
+  productToEdit?: Product | null;
 }
 
-const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) => {
-  const { addProduct } = useProducts();
+const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, productToEdit }) => {
+  const { addProduct, updateProduct } = useProducts();
   
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState(CATEGORIES[1]); // Default to 'Abstract'
+  const [category, setCategory] = useState(CATEGORIES[1]);
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [variants, setVariants] = useState<Omit<ProductVariant, 'id'>[]>([]);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (productToEdit) {
+      setName(productToEdit.name);
+      setPrice(String(productToEdit.price));
+      setDescription(productToEdit.description);
+      setCategory(productToEdit.category);
+      setMainImage(productToEdit.imageUrl);
+      setVariants(productToEdit.variants || []);
+    } else {
+      resetForm();
+    }
+  }, [productToEdit, isOpen]);
 
   const resetForm = () => {
     setName('');
@@ -41,14 +55,11 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) =>
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
-      // Add file size validation
       if (file.size > 2 * 1024 * 1024) { // 2MB limit
         setError('Image file is too large. Please upload an image under 2MB.');
         return;
       }
-      setError(''); // Clear previous errors
-
+      setError('');
       try {
         const base64 = await fileToBase64(file);
         if (typeof index === 'number') {
@@ -59,7 +70,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) =>
           setMainImage(base64);
         }
       } catch (uploadError) {
-        console.error("Error converting file to base64:", uploadError);
         setError("There was an error processing the image. Please try another file.");
       }
     }
@@ -90,23 +100,27 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) =>
         return;
     }
     setError('');
-    
-    const newProduct: Product = {
-        id: Date.now(),
+
+    const productData = {
         name,
         price: parseFloat(price),
         description,
         category,
         imageUrl: mainImage,
         variants: variants.map((v, i) => ({
-            id: Date.now() + i + 1, // Simple unique id
+            id: (v as ProductVariant).id || Date.now() + i + 1,
             name: v.name,
             colorCode: v.colorCode,
             imageUrl: v.imageUrl!,
         }))
     };
     
-    addProduct(newProduct);
+    if (productToEdit) {
+        updateProduct({ ...productData, id: productToEdit.id });
+    } else {
+        addProduct({ ...productData, id: Date.now() });
+    }
+    
     handleClose();
   };
 
@@ -118,13 +132,12 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) =>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
           <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white">Add New Product</h2>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white">{productToEdit ? 'Edit Product' : 'Add New Product'}</h2>
             <button onClick={handleClose} className="text-gray-500 hover:text-gray-800 dark:hover:text-white">
               <XMarkIcon />
             </button>
           </div>
           <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6 space-y-6">
-            {/* Main Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Name</label>
@@ -151,8 +164,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) =>
                 <ImageUploader image={mainImage} onUpload={e => handleImageUpload(e)} id="main-image-upload" />
               </div>
             </div>
-
-            {/* Variants */}
             <div className="space-y-4 pt-4 border-t dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Variants</h3>
               {variants.map((variant, index) => (
@@ -170,9 +181,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose }) =>
               ))}
               <button type="button" onClick={handleAddVariant} className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline">+ Add Variant</button>
             </div>
-            
             {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-          
             <div className="pt-4 border-t dark:border-gray-700 flex justify-end gap-3">
               <button type="button" onClick={handleClose} className="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
               <button type="submit" className="px-4 py-2 rounded-md bg-teal-600 text-white hover:bg-teal-700">Save Product</button>
@@ -204,6 +213,5 @@ const ImageUploader: React.FC<{image: string | null, onUpload: (e: React.ChangeE
     <input type="file" id={id} onChange={onUpload} accept="image/png, image/jpeg, image/webp" className="hidden" />
   </div>
 );
-
 
 export default AddProductModal;

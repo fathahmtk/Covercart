@@ -7,6 +7,8 @@ const PRODUCTS_STORAGE_KEY = 'covercart-products';
 interface ProductContextType {
   products: Product[];
   addProduct: (product: Product) => void;
+  updateProduct: (updatedProduct: Product) => void;
+  deleteProduct: (productId: number) => void;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -30,20 +32,37 @@ const loadProductsFromStorage = (): Product[] => {
 export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>(loadProductsFromStorage);
 
+  const saveProductsToStorage = (productsToSave: Product[]) => {
+     try {
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(productsToSave));
+    } catch (error) {
+      console.error("Failed to save products to localStorage", error);
+    }
+  }
+
   const addProduct = (product: Product) => {
-    // Add new product to the beginning of the list for visibility
     const newProducts = [product, ...products];
     setProducts(newProducts);
-    try {
-      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(newProducts));
-    } catch (error) {
-      console.error("Failed to save new product to localStorage", error);
-    }
+    saveProductsToStorage(newProducts);
+  };
+
+  const updateProduct = (updatedProduct: Product) => {
+    const newProducts = products.map(p => p.id === updatedProduct.id ? updatedProduct : p);
+    setProducts(newProducts);
+    saveProductsToStorage(newProducts);
+  };
+
+  const deleteProduct = (productId: number) => {
+    const newProducts = products.filter(p => p.id !== productId);
+    setProducts(newProducts);
+    saveProductsToStorage(newProducts);
   };
 
   const value = {
     products,
     addProduct,
+    updateProduct,
+    deleteProduct
   };
 
   return <ProductContext.Provider value={value}>{children}</ProductContext.Provider>;

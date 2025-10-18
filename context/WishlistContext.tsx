@@ -1,5 +1,7 @@
-import React, { createContext, useState, useContext, ReactNode, useMemo, useCallback } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { Product } from '../types';
+
+const WISHLIST_STORAGE_KEY = 'covercart-wishlist';
 
 interface WishlistContextType {
   wishlistItems: Product[];
@@ -11,8 +13,26 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
+const loadWishlistFromStorage = (): Product[] => {
+    try {
+        const storedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
+        return storedWishlist ? JSON.parse(storedWishlist) : [];
+    } catch (error) {
+        console.error("Failed to parse wishlist from localStorage", error);
+        return [];
+    }
+};
+
 export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<Product[]>(loadWishlistFromStorage);
+  
+  useEffect(() => {
+    try {
+        localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlistItems));
+    } catch (error) {
+        console.error("Failed to save wishlist to localStorage", error);
+    }
+  }, [wishlistItems]);
 
   const isItemInWishlist = useCallback((productId: number) => {
     return wishlistItems.some(item => item.id === productId);

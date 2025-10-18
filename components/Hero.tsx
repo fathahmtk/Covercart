@@ -17,17 +17,17 @@ const Hero: React.FC = () => {
       </div>
       
       <div className="relative z-10 container mx-auto px-6 text-center">
-        <div className="animate-fade-in" style={{animationDelay: '0.3s'}}>
+        <div className="opacity-0 animate-slide-in-bottom" style={{ animationDelay: '0.2s' }}>
             <h1 className="text-4xl md:text-7xl font-extrabold leading-tight mb-4 drop-shadow-2xl tracking-tight">
               Style That Speaks.
             </h1>
         </div>
-        <div className="animate-fade-in" style={{animationDelay: '0.6s'}}>
+        <div className="opacity-0 animate-slide-in-bottom" style={{ animationDelay: '0.5s' }}>
             <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto drop-shadow-lg font-light text-gray-200">
               From runway trends to your own AI creations, find the perfect case that's uniquely you.
             </p>
         </div>
-        <div className="animate-fade-in flex flex-wrap justify-center gap-4" style={{animationDelay: '0.9s'}}>
+        <div className="opacity-0 animate-slide-in-bottom flex flex-wrap justify-center gap-4" style={{ animationDelay: '0.8s' }}>
           <a 
             href="#products" 
             className="bg-white text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 shadow-lg"

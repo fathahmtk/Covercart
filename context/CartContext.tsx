@@ -1,5 +1,7 @@
-import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useMemo, useEffect } from 'react';
 import { Product, CartItem, ProductVariant } from '../types';
+
+const CART_STORAGE_KEY = 'covercart-cart';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -13,8 +15,26 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const loadCartFromStorage = (): CartItem[] => {
+  try {
+    const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+    return storedCart ? JSON.parse(storedCart) : [];
+  } catch (error) {
+    console.error("Failed to parse cart from localStorage", error);
+    return [];
+  }
+};
+
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(loadCartFromStorage);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    } catch (error) {
+      console.error("Failed to save cart to localStorage", error);
+    }
+  }, [cartItems]);
 
   const addToCart = (product: Product, variant?: ProductVariant, quantity = 1) => {
     const cartItemId = variant ? `${product.id}-${variant.id}` : `${product.id}-0`;

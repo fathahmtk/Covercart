@@ -35,10 +35,14 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   const [addedToCart, setAddedToCart] = useState(false);
 
   useEffect(() => {
-    if (selectedVariant) {
-      setMainImage(selectedVariant.imageUrl);
-    }
-  }, [selectedVariant]);
+    // This effect runs when the component mounts or the product prop changes.
+    // It resets the state for the new product being displayed.
+    const initialVariant = product.variants && product.variants.length > 0 ? product.variants[0] : null;
+    setSelectedVariant(initialVariant);
+    setMainImage(initialVariant ? initialVariant.imageUrl : product.imageUrl);
+    setQuantity(1);
+    setAddedToCart(false);
+  }, [product]);
 
   const isInWishlist = isItemInWishlist(product.id);
   const { average, count } = getAverageRating(product.id);
@@ -82,9 +86,9 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   return (
     <div className="animate-fade-in">
       <div className="container mx-auto px-6 py-12">
-        <button onClick={onBack} className="mb-8 text-teal-600 dark:text-teal-400 hover:underline">
+        <a href="#/" onClick={(e) => { e.preventDefault(); onBack(); }} className="mb-8 inline-block text-teal-600 dark:text-teal-400 hover:underline">
           &larr; Back to Products
-        </button>
+        </a>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image Gallery */}

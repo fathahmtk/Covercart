@@ -21,7 +21,6 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const { theme, toggleTheme } = useTheme();
-  const [localSearch, setLocalSearch] = useState(searchQuery);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -33,44 +32,35 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Debounce the search input
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (localSearch !== searchQuery) {
-        onSearchChange(localSearch);
-      }
-    }, 300); // 300ms debounce delay
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [localSearch, onSearchChange, searchQuery]);
-
-  // Sync local state if the prop changes from parent
-  useEffect(() => {
-    setLocalSearch(searchQuery);
-  }, [searchQuery]);
-
   const handleClearSearch = () => {
-    setLocalSearch('');
     onSearchChange(''); // Clear immediately
+  };
+  
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // If we are already on the home page, scroll to top. Otherwise, navigate to home.
+    if (window.location.hash === '#/' || window.location.hash === '') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        window.location.hash = '#/';
+    }
   };
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 dark:bg-gray-950/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm' : 'bg-transparent'}`}>
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[--color-bg]/80 dark:bg-[--color-bg]/80 backdrop-blur-xl border-b border-[--color-border]/50 shadow-sm' : 'bg-transparent'}`}>
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center relative">
 
         {/* --- Main Header Content --- */}
         <div className="flex items-center space-x-8">
-            <a href="#" className="flex items-center space-x-2 text-2xl font-bold text-[--color-text]">
+            <a href="#/" onClick={handleLogoClick} className="flex items-center space-x-2 text-2xl font-bold text-[--color-text]">
             <LogoIcon />
             <span style={{fontFamily: 'var(--font-heading)'}}>CoverCart</span>
             </a>
             <div className="hidden md:flex items-center space-x-6">
-                <a href="#products" className="text-gray-600 dark:text-gray-300 hover:text-[--color-primary] dark:hover:text-[--color-primary] transition-colors font-medium">Products</a>
-                <a href="#ai-designer" className="text-gray-600 dark:text-gray-300 hover:text-[--color-primary] dark:hover:text-[--color-primary] transition-colors font-medium">AI Designer</a>
-                <a href="#about" className="text-gray-600 dark:text-gray-300 hover:text-[--color-primary] dark:hover:text-[--color-primary] transition-colors font-medium">About</a>
-                <a href="#contact" className="text-gray-600 dark:text-gray-300 hover:text-[--color-primary] dark:hover:text-[--color-primary] transition-colors font-medium">Contact</a>
+                <a href="#products" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Products</a>
+                <a href="#ai-designer" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">AI Designer</a>
+                <a href="#about" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">About</a>
+                <a href="#contact" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Contact</a>
             </div>
         </div>
         <div className="flex items-center space-x-2 sm:space-x-4">
@@ -82,11 +72,11 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
              <input
                type="text"
                placeholder="Search..."
-               value={localSearch}
-               onChange={(e) => setLocalSearch(e.target.value)}
-               className="w-32 lg:w-56 py-2 pl-10 pr-10 text-gray-700 bg-white/50 border border-gray-200 rounded-full dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-[--color-primary] dark:focus:border-[--color-primary] focus:ring-[--color-primary] focus:ring-opacity-40 focus:outline-none focus:ring transition-all duration-300"
+               value={searchQuery}
+               onChange={(e) => onSearchChange(e.target.value)}
+               className="w-32 lg:w-56 py-2 pl-10 pr-10 text-[--color-text] bg-white/50 border border-[--color-border] rounded-full dark:bg-gray-800 dark:border-gray-600 focus:border-[--color-primary] dark:focus:border-[--color-primary] focus:ring-[--color-primary] focus:ring-opacity-40 focus:outline-none focus:ring transition-all duration-300"
              />
-             {localSearch && (
+             {searchQuery && (
                 <button onClick={handleClearSearch} className="absolute inset-y-0 right-0 flex items-center pr-3" aria-label="Clear search">
                     <XMarkIcon className="w-5 h-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"/>
                 </button>
@@ -94,15 +84,15 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
            </div>
 
            {/* Mobile Search Toggle */}
-          <button onClick={() => setIsMobileSearchOpen(true)} className="md:hidden text-gray-600 dark:text-gray-300 hover:text-[--color-primary] dark:hover:text-[--color-primary] transition-colors p-2" aria-label="Open search">
+          <button onClick={() => setIsMobileSearchOpen(true)} className="md:hidden text-[--color-text-muted] hover:text-[--color-primary] transition-colors p-2" aria-label="Open search">
              <SearchIcon className="w-6 h-6" />
           </button>
           
-          <button onClick={toggleTheme} className="text-gray-600 dark:text-gray-300 hover:text-amber-500 dark:hover:text-amber-400 transition-colors p-2" aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+          <button onClick={toggleTheme} className="text-[--color-text-muted] hover:text-amber-500 dark:hover:text-amber-400 transition-colors p-2" aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
               {theme === 'light' ? <MoonIcon className="w-6 h-6" /> : <SunIcon className="w-6 h-6" />}
           </button>
 
-          <button onClick={onWishlistClick} className="relative text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1">
+          <button onClick={onWishlistClick} className="relative text-[--color-text-muted] hover:text-red-500 dark:hover:text-red-400 transition-colors p-1">
             <HeartIcon />
             {wishlistCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
@@ -110,7 +100,7 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
               </span>
             )}
           </button>
-          <button onClick={onCartClick} className="relative text-gray-600 dark:text-gray-300 hover:text-[--color-primary] dark:hover:text-[--color-primary] transition-colors p-1">
+          <button onClick={onCartClick} className="relative text-[--color-text-muted] hover:text-[--color-primary] transition-colors p-1">
             <ShoppingCartIcon />
             {cartCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
@@ -123,24 +113,24 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
 
         {/* --- Mobile Search Overlay --- */}
         {isMobileSearchOpen && (
-          <div className="absolute inset-0 bg-white dark:bg-gray-950 flex items-center px-4 z-10">
+          <div className="absolute inset-0 bg-[--color-bg] flex items-center px-4 z-10">
             <span className="absolute inset-y-0 left-0 flex items-center pl-6">
               <SearchIcon className="text-gray-400 w-6 h-6" />
             </span>
             <input
               type="text"
               placeholder="Search products..."
-              value={localSearch}
-              onChange={(e) => setLocalSearch(e.target.value)}
-              className="w-full h-full text-lg bg-transparent pl-12 pr-24 focus:outline-none text-gray-800 dark:text-white"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full h-full text-lg bg-transparent pl-12 pr-24 focus:outline-none text-[--color-text]"
               autoFocus
             />
-            {localSearch && (
-                <button onClick={handleClearSearch} className="absolute right-14 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Clear search">
+            {searchQuery && (
+                <button onClick={handleClearSearch} className="absolute right-14 text-gray-500 hover:text-[--color-text]" aria-label="Clear search">
                     <XMarkIcon className="w-7 h-7" />
                 </button>
             )}
-            <button onClick={() => setIsMobileSearchOpen(false)} className="absolute right-4 text-gray-500 hover:text-gray-800 dark:hover:text-white" aria-label="Close search">
+            <button onClick={() => setIsMobileSearchOpen(false)} className="absolute right-4 text-gray-500 hover:text-[--color-text]" aria-label="Close search">
               <XMarkIcon className="w-7 h-7" />
             </button>
           </div>
