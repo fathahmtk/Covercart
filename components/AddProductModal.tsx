@@ -23,6 +23,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
   const [category, setCategory] = useState(CATEGORIES[1]);
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [variants, setVariants] = useState<Partial<ProductVariant>[]>([]);
+  const [isFeatured, setIsFeatured] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
       setMainImage(productToEdit.imageUrl);
       setVariants(productToEdit.variants || []);
       setStock(String(productToEdit.stock ?? ''));
+      setIsFeatured(productToEdit.isFeatured || false);
     } else {
       resetForm();
     }
@@ -47,6 +49,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
     setCategory(CATEGORIES[1]);
     setMainImage(null);
     setVariants([]);
+    setIsFeatured(false);
     setError('');
   };
 
@@ -113,6 +116,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
         // Based on existing data, brand is the same as category.
         brand: category,
         imageUrl: mainImage,
+        isFeatured,
         stock: variants.length > 0 ? undefined : parseInt(stock, 10),
         variants: variants.map((v, i) => ({
             id: v.id || Date.now() + i + 1,
@@ -159,6 +163,18 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
               <textarea id="description" rows={3} value={description} onChange={e => setDescription(e.target.value)} className="mt-1 input-style" required />
+            </div>
+            <div className="flex items-center">
+                <input
+                    id="isFeatured"
+                    type="checkbox"
+                    checked={isFeatured}
+                    onChange={(e) => setIsFeatured(e.target.checked)}
+                    className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label htmlFor="isFeatured" className="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Mark as Featured Product
+                </label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

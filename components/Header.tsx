@@ -59,6 +59,7 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
             </a>
             <div className="hidden md:flex items-center space-x-6">
                 <a href="#products" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Products</a>
+                <a href="#/gallery" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Gallery</a>
                 <a href="#about" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">About</a>
                 <a href="#contact" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Contact</a>
             </div>

@@ -53,7 +53,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
     } else {
       // For products without variants, add directly to the cart.
       addToCart(product, undefined, 1);
-      // TODO: Implement a visual feedback like a toast notification.
     }
   };
 

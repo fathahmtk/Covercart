@@ -83,8 +83,14 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
       case 'name-desc':
         sorted.sort((a, b) => b.name.localeCompare(a.name));
         break;
+      case 'featured':
       default:
-        // Keep original order for "Featured"
+        // Prioritize featured products, then maintain original order.
+        sorted.sort((a, b) => {
+          const aFeatured = a.isFeatured ? 1 : 0;
+          const bFeatured = b.isFeatured ? 1 : 0;
+          return bFeatured - aFeatured;
+        });
         break;
     }
     

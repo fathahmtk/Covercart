@@ -14,6 +14,7 @@ export interface Product {
   imageUrl: string;
   category: string;
   brand: string;
+  isFeatured?: boolean;
   variants?: ProductVariant[];
   stock?: number;
 }

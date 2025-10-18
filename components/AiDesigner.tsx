@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { generateImageWithGemini } from '../services/geminiService';
 import { SparklesIcon } from './icons/SparklesIcon';
 import AnimateOnScroll from './AnimateOnScroll';
+import LazyImage from './LazyImage';
 
 type PhoneModel = 'iPhone 15 Pro' | 'Galaxy S24' | 'Pixel 8 Pro' | 'Generic';
 const phoneModels: PhoneModel[] = ['iPhone 15 Pro', 'Galaxy S24', 'Pixel 8 Pro', 'Generic'];
@@ -183,7 +184,7 @@ const AiDesigner: React.FC = () => {
                       </div>
                   )}
                   {generatedImage && (
-                      <img src={generatedImage} alt="AI generated phone case" className="w-full h-full object-cover" />
+                      <LazyImage src={generatedImage} alt="AI generated phone case" className="w-full h-full object-cover" />
                   )}
                   {!generatedImage && !isLoading && (
                       <div className="w-full h-full flex flex-col items-center justify-center text-center p-4 bg-gray-900">

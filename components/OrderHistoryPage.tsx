@@ -1,7 +1,9 @@
+
 import React, { useState, useMemo } from 'react';
 import { useOrders } from '../context/OrderContext';
 import { Order } from '../types';
 import { ClipboardListIcon } from './icons/ClipboardListIcon';
+import LazyImage from './LazyImage';
 
 interface LegalPageProps {
   onBack: () => void;
@@ -83,7 +85,7 @@ const OrderHistoryPage: React.FC<LegalPageProps> = ({ onBack }) => {
                             <ul className="space-y-2 mb-4">
                                 {order.items.map(item => (
                                     <li key={item.cartItemId} className="flex items-center gap-4 text-sm">
-                                        <img src={item.imageUrl} alt={item.productName} className="w-12 h-12 rounded-md object-cover" />
+                                        <LazyImage src={item.imageUrl} alt={item.productName} className="w-12 h-12 rounded-md object-cover" />
                                         <div className="flex-grow">
                                             <p className="font-semibold">{item.productName} {item.variantName && `(${item.variantName})`}</p>
                                             <p className="text-[--color-text-muted]">Qty: {item.quantity}</p>

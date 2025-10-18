@@ -9,6 +9,7 @@ import { MinusIcon } from './icons/MinusIcon';
 import { ShoppingCartIcon } from './icons/ShoppingCartIcon';
 import { BUSINESS_INFO } from '../constants';
 import { Order } from '../types';
+import LazyImage from './LazyImage';
 
 interface CartProps {
   isOpen: boolean;
@@ -125,7 +126,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               <div className="space-y-4">
                 {cartItems.map(item => (
                   <div key={item.cartItemId} className="flex items-start space-x-4">
-                    <img src={item.imageUrl} alt={item.productName} className="w-20 h-20 rounded-md object-cover" />
+                    <LazyImage src={item.imageUrl} alt={item.productName} className="w-20 h-20 rounded-md object-cover" />
                     <div className="flex-grow">
                       <h4 className="font-semibold text-gray-800 dark:text-gray-200">{item.productName}</h4>
                       {item.variantName && <p className="text-sm text-gray-500 dark:text-gray-400">{item.variantName}</p>}

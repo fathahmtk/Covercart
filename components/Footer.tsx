@@ -60,6 +60,7 @@ const Footer: React.FC = () => {
             <h5 className="font-bold text-white uppercase tracking-wider">Quick Links</h5>
             <ul className="mt-4 space-y-2">
               <li><a href="#products" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Collection</a></li>
+              <li><a href="#/gallery" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Gallery</a></li>
               <li><a href="#about" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">About Us</a></li>
               <li><a href="#contact" className="text-gray-400 hover:text-white hover:underline transition-colors text-sm">Contact</a></li>
             </ul>

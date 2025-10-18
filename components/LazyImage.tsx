@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { PhotographIcon } from './icons/PhotographIcon';
+import { ImageBrokenIcon } from './icons/ImageBrokenIcon';
 
 interface LazyImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
   src?: string | Blob;
@@ -53,18 +54,19 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className, placeholderC
   };
   
   const showPlaceholder = !isLoaded && !isError;
-  const showImage = isLoaded && !isError;
 
   return (
-    <div ref={containerRef} className={`relative overflow-hidden ${placeholderClassName || className}`}>
+    <div ref={containerRef} className={`relative overflow-hidden bg-gray-200 dark:bg-gray-800 ${placeholderClassName || className}`}>
       {showPlaceholder && (
-        <div className={`absolute inset-0 bg-gray-300 dark:bg-gray-700 animate-pulse ${placeholderClassName || className}`} />
+        <div className={`absolute inset-0 flex items-center justify-center ${placeholderClassName || className}`}>
+            <PhotographIcon className="w-1/4 h-1/4 text-gray-400 dark:text-gray-600 opacity-50" />
+        </div>
       )}
       
       {isError && (
-        <div className={`absolute inset-0 bg-gray-200 dark:bg-gray-800 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600 ${placeholderClassName || className}`}>
-          <PhotographIcon className="w-1/4 h-1/4 mb-2" />
-          <span className="text-xs">Image not available</span>
+        <div className={`absolute inset-0 flex flex-col items-center justify-center text-gray-500 dark:text-gray-500 ${placeholderClassName || className}`}>
+          <ImageBrokenIcon className="w-1/4 h-1/4 mb-2" />
+          <span className="text-xs font-semibold">Could not load image</span>
         </div>
       )}
       
@@ -74,7 +76,7 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className, placeholderC
           alt={alt}
           onLoad={handleImageLoad}
           onError={handleImageError}
-          className={`${className} transition-opacity duration-500 ${showImage ? 'opacity-100' : 'opacity-0'}`}
+          className={`${className} transition-all duration-500 ease-in-out ${isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-md'}`}
           {...props}
         />
       )}

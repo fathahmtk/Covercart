@@ -19,6 +19,7 @@ import { BUSINESS_INFO } from './constants';
 import ProductDetailsSkeleton from './components/ProductDetailsSkeleton';
 import { ToastContainer } from './components/ToastProvider';
 import OrderHistoryPage from './components/OrderHistoryPage';
+import GalleryPage from './components/GalleryPage';
 
 const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -122,6 +123,11 @@ const App: React.FC = () => {
     if (currentPath === '#/orders') {
       return <OrderHistoryPage onBack={handleBackToList} />;
     }
+    
+    if (currentPath === '#/gallery') {
+        return <GalleryPage onBack={handleBackToList} onProductClick={handleProductClick} />;
+    }
+
 
     // Default to home page
     return (

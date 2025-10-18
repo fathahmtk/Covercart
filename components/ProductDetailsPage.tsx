@@ -5,7 +5,6 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useReviews } from '../context/ReviewsContext';
 import StarRating from './StarRating';
-import ProductReviews from './ProductReviews';
 import { HeartIcon } from './icons/HeartIcon';
 import { ShoppingCartIcon } from './icons/ShoppingCartIcon';
 import { PlusIcon } from './icons/PlusIcon';
@@ -22,6 +21,7 @@ import { TwitterIcon } from './icons/TwitterIcon';
 import { WhatsAppIcon } from './icons/WhatsAppIcon';
 import { LinkIcon } from './icons/LinkIcon';
 import { useToast } from './ToastProvider';
+import ReviewsModal from './ReviewsModal';
 
 interface ProductDetailsPageProps {
   product: Product;
@@ -45,6 +45,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   const [mainImage, setMainImage] = useState(product.imageUrl);
   const [quantity, setQuantity] = useState(1);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   
   const { average, count } = getAverageRating(product.id);
   
@@ -100,6 +101,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
     setMainImage(initialVariant ? initialVariant.imageUrl : product.imageUrl);
     setQuantity(1);
     setIsLightboxOpen(false); // Close lightbox when product changes
+    setIsReviewsModalOpen(false); // Close reviews modal when product changes
   }, [product]);
 
   const isInWishlist = isItemInWishlist(product.id);
@@ -209,10 +211,10 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{product.category}</span>
             <h1 className="text-4xl font-extrabold my-2 text-gray-900 dark:text-white">{product.name}</h1>
             
-            <a href="#reviews" className="flex items-center gap-2 mb-4 text-sm text-gray-500 dark:text-gray-400 hover:underline">
+            <button onClick={() => setIsReviewsModalOpen(true)} className="flex items-center gap-2 mb-4 text-sm text-gray-500 dark:text-gray-400 hover:underline">
               <StarRating rating={average} />
               <span>({count} reviews)</span>
-            </a>
+            </button>
 
             <p className="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-4">₹{product.price}</p>
             
@@ -296,7 +298,6 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
         </div>
       </div>
 
-      <ProductReviews product={product} />
       <UserGallery product={product} />
       <RelatedProducts 
         currentProduct={product}
@@ -306,6 +307,11 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
       {isLightboxOpen && (
         <Lightbox imageUrl={mainImage} onClose={() => setIsLightboxOpen(false)} />
       )}
+      <ReviewsModal
+        isOpen={isReviewsModalOpen}
+        onClose={() => setIsReviewsModalOpen(false)}
+        product={product}
+      />
     </div>
   );
 };

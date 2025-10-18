@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
@@ -6,6 +7,7 @@ import { TrashIcon } from './icons/TrashIcon';
 import { ShoppingCartIcon } from './icons/ShoppingCartIcon';
 import { HeartIcon } from './icons/HeartIcon';
 import { Product } from '../types';
+import LazyImage from './LazyImage';
 
 interface WishlistProps {
   isOpen: boolean;
@@ -61,7 +63,7 @@ const Wishlist: React.FC<WishlistProps> = ({ isOpen, onClose }) => {
             <div className="flex-grow overflow-y-auto p-6 space-y-4">
               {wishlistItems.map(item => (
                 <div key={item.id} className="flex items-start space-x-4">
-                  <img src={item.imageUrl} alt={item.name} className="w-20 h-20 rounded-md object-cover" />
+                  <LazyImage src={item.imageUrl} alt={item.name} className="w-20 h-20 rounded-md object-cover" />
                   <div className="flex-grow">
                     <h4 className="font-semibold text-gray-800 dark:text-gray-200">{item.name}</h4>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">₹{item.price}</p>
