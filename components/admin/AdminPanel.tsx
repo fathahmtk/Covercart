@@ -24,7 +24,7 @@ const AdminPanel: React.FC = () => {
   useEffect(() => {
     if (!isAuthenticated) {
       const password = prompt('Please enter the admin password:');
-      if (password === 'admin123') { // Simple hardcoded password for demo
+      if (password === 'Admin password') { // Simple hardcoded password for demo
         sessionStorage.setItem('isAdminAuthenticated', 'true');
         setIsAuthenticated(true);
       } else {
