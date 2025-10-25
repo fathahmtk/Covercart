@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { Product, ProductVariant } from '../types';
@@ -236,11 +238,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
           </form>
         </div>
       </div>
-       <style>{`
-          .input-style { display: block; width: 100%; border-radius: 0.375rem; border: 1px solid; border-color: #D1D5DB; background-color: #FFFFFF; padding: 0.5rem 0.75rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: border-color 0.2s, box-shadow 0.2s; }
-          .dark .input-style { border-color: #4B5563; background-color: #374151; color: #F3F4F6; }
-          .input-style:focus { outline: 2px solid transparent; outline-offset: 2px; --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000); border-color: #14B8A6; --tw-ring-color: #14B8A6; }
-       `}</style>
     </>
   );
 };

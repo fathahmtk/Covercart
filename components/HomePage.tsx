@@ -1,4 +1,5 @@
 
+
 import React, { useMemo } from 'react';
 import Hero from './Hero';
 import ProductList from './ProductList';
@@ -7,6 +8,7 @@ import Contact from './Contact';
 import { Product } from '../types';
 import { useProducts } from '../context/ProductContext';
 import ProductCarousel from './ProductCarousel';
+import PersonalizedRecommendations from './PersonalizedRecommendations';
 
 interface HomePageProps {
   searchQuery: string;
@@ -55,6 +57,12 @@ const HomePage: React.FC<HomePageProps> = ({ searchQuery, onProductClick, onQuic
         onProductClick={onProductClick}
         onQuickViewClick={onQuickViewClick}
         bgColor="bg-[--color-bg-subtle]"
+      />
+      <PersonalizedRecommendations
+        title="Just For You"
+        onProductClick={onProductClick}
+        onQuickViewClick={onQuickViewClick}
+        bgColor="bg-white dark:bg-gray-950"
       />
       <ProductList 
         searchQuery={searchQuery} 

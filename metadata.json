@@ -1,5 +1,6 @@
 {
-  "name": "covercove.com - AI Mobile Covers",
-  "description": "An e-commerce storefront for covercove.com, a mobile cover business. Features a product gallery of mobile cases, a shopping cart, and a rich collection of designer phone covers.",
-  "requestFramePermissions": []
+  "name": "covercart.in - AI Mobile Covers",
+  "description": "An e-commerce storefront for covercart.in, a mobile cover business. Features a product gallery of mobile cases, a shopping cart, and a rich collection of designer phone covers.",
+  "requestFramePermissions": [],
+  "developerNote": "For production, set ADMIN_PASSWORD environment variable for the admin panel. The default is 'Admin password' during development."
 }

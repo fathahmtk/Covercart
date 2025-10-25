@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState, useCallback } from 'react';
 import { XMarkIcon } from './icons/XMarkIcon';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
@@ -53,7 +54,7 @@ const Lightbox: React.FC<LightboxProps> = ({ images, initialIndex = 0, onClose }
       {images.length > 1 && (
         <button
             onClick={(e) => { e.stopPropagation(); goToPrev(); }}
-            className="absolute top-1/2 left-4 -translate-y-1/2 z-10 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all"
+            className="absolute top-1/2 left-4 -translate-y-1/2 z-10 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"
             aria-label="Previous image"
         >
             <ChevronLeftIcon className="w-8 h-8 text-white" />
@@ -77,7 +78,7 @@ const Lightbox: React.FC<LightboxProps> = ({ images, initialIndex = 0, onClose }
       {images.length > 1 && (
           <button
               onClick={(e) => { e.stopPropagation(); goToNext(); }}
-              className="absolute top-1/2 right-4 -translate-y-1/2 z-10 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all"
+              className="absolute top-1/2 right-4 -translate-y-1/2 z-10 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"
               aria-label="Next image"
           >
               <ChevronRightIcon className="w-8 h-8 text-white" />
@@ -87,7 +88,7 @@ const Lightbox: React.FC<LightboxProps> = ({ images, initialIndex = 0, onClose }
       {/* Close Button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors z-20"
+        className="absolute top-4 right-4 bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors z-20 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"
         aria-label="Close image view"
       >
         <XMarkIcon className="w-6 h-6" />

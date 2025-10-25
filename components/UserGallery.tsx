@@ -1,3 +1,5 @@
+
+
 import React, { useState } from 'react';
 import { Product } from '../types';
 import { useUserGallery } from '../context/UserGalleryContext';
@@ -13,7 +15,9 @@ interface UserGalleryProps {
 
 const UserGallery: React.FC<UserGalleryProps> = ({ product }) => {
   const { getImagesForProduct, addImage } = useUserGallery();
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxInitialIndex, setLightboxInitialIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -60,6 +64,12 @@ const UserGallery: React.FC<UserGalleryProps> = ({ product }) => {
       setError('Failed to upload image. Please try again.');
     }
   };
+  
+  const openLightbox = (imageIndex: number) => {
+    setLightboxImages(images.map(item => item.imageUrl));
+    setLightboxInitialIndex(imageIndex);
+    setIsLightboxOpen(true);
+  };
 
   return (
     <>
@@ -71,15 +81,15 @@ const UserGallery: React.FC<UserGalleryProps> = ({ product }) => {
               <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">From Our Customers</h3>
               {images.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {images.map((item) => (
-                    <div key={item.id} className="group relative cursor-pointer" onClick={() => setLightboxImage(item.imageUrl)}>
+                  {images.map((item, index) => (
+                    <div key={item.id} className="group relative cursor-pointer" onClick={() => openLightbox(index)}>
                       <LazyImage
                         src={item.imageUrl}
                         alt={item.caption || 'User submitted photo'}
                         className="w-full h-full object-cover rounded-lg aspect-square"
                       />
                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2">
-                          <p className="text-white text-xs text-center line-clamp-2">{item.caption}</p>
+                          <p className="text-white text-sm text-center line-clamp-2">{item.caption}</p>
                        </div>
                     </div>
                   ))}
@@ -146,8 +156,8 @@ const UserGallery: React.FC<UserGalleryProps> = ({ product }) => {
         </div>
       </section>
       
-      {lightboxImage && (
-        <Lightbox imageUrl={lightboxImage} onClose={() => setLightboxImage(null)} />
+      {isLightboxOpen && (
+        <Lightbox images={lightboxImages} initialIndex={lightboxInitialIndex} onClose={() => setIsLightboxOpen(false)} />
       )}
     </>
   );

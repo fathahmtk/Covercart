@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -9,6 +10,7 @@ import { ReviewsProvider } from './context/ReviewsContext';
 import { UserGalleryProvider } from './context/UserGalleryContext';
 import { OrderProvider } from './context/OrderContext';
 import { ToastProvider } from './components/ToastProvider';
+import { HeroProvider } from './context/HeroContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -24,7 +26,9 @@ root.render(
               <CartProvider>
                 <WishlistProvider>
                   <OrderProvider>
-                    <App />
+                    <HeroProvider>
+                      <App />
+                    </HeroProvider>
                   </OrderProvider>
                 </WishlistProvider>
               </CartProvider>

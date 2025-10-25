@@ -30,7 +30,9 @@ interface GalleryItem {
 const GalleryPage: React.FC<GalleryPageProps> = ({ onBack, onProductClick }) => {
   const { products, loading } = useProducts();
   const { galleryItems: userGalleryItemsByProduct } = useUserGallery();
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxInitialIndex, setLightboxInitialIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'product' | 'user'>('all');
 
   const allImages = useMemo<GalleryItem[]>(() => {
@@ -86,6 +88,12 @@ const GalleryPage: React.FC<GalleryPageProps> = ({ onBack, onProductClick }) => 
   }, [allImages, filter]);
 
   const findProductById = (id: number) => products.find(p => p.id === id);
+  
+  const openLightbox = (imageSrc: string, imageIndex: number) => {
+    setLightboxImages(filteredImages.map(item => item.src));
+    setLightboxInitialIndex(imageIndex);
+    setIsLightboxOpen(true);
+  };
 
   return (
     <>
@@ -119,7 +127,7 @@ const GalleryPage: React.FC<GalleryPageProps> = ({ onBack, onProductClick }) => 
           <div className="masonry-grid">
             {filteredImages.map((item, index) => (
               <AnimateOnScroll key={item.id} delay={index * 50} className="fade-in-up masonry-item group">
-                <div className="relative overflow-hidden rounded-lg shadow-md cursor-pointer border border-[--color-border]" onClick={() => setLightboxImage(item.src)}>
+                <div className="relative overflow-hidden rounded-lg shadow-md cursor-pointer border border-[--color-border]" onClick={() => openLightbox(item.src, index)}>
                   <LazyImage src={item.src} alt={item.alt} className="w-full h-auto block" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
@@ -145,7 +153,7 @@ const GalleryPage: React.FC<GalleryPageProps> = ({ onBack, onProductClick }) => 
           </div>
         </div>
       </div>
-      {lightboxImage && <Lightbox imageUrl={lightboxImage} onClose={() => setLightboxImage(null)} />}
+      {isLightboxOpen && <Lightbox images={lightboxImages} initialIndex={lightboxInitialIndex} onClose={() => setIsLightboxOpen(false)} />}
       <style>{`
         .masonry-grid {
           column-count: 2;
@@ -183,6 +191,7 @@ const GalleryPage: React.FC<GalleryPageProps> = ({ onBack, onProductClick }) => 
           background-color: var(--color-primary);
           color: white;
           border-color: var(--color-primary);
+          box-shadow: var(--shadow-elevation-low);
         }
       `}</style>
     </>

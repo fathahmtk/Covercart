@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -34,7 +35,7 @@ const App: React.FC = () => {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "covercove.com",
+    "name": "covercart.in",
     "url": window.location.origin,
     "logo": `${window.location.origin}/vite.svg`, // Assuming vite.svg is the logo
     "contactPoint": {
@@ -45,7 +46,7 @@ const App: React.FC = () => {
   };
 
   useSEO({
-    title: 'covercove.com - Designer Mobile Covers and Cases',
+    title: 'covercart.in - Designer Mobile Covers and Cases',
     description: 'Discover a stunning collection of mobile covers. High-quality cases for Apple, Samsung, Google, and more.',
     keywords: 'mobile cover, phone case, designer phone case, custom phone case, samsung case, apple iphone cover',
     schema: organizationSchema,

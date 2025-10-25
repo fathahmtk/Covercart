@@ -1,42 +1,15 @@
 
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 import { ChevronRightIcon } from './icons/ChevronRightIcon';
-
-const heroImages = [
-  {
-    id: '1603715454235-5026f12204a1',
-    alt: 'A stylish phone with an elegant white and gold marble case.'
-  },
-  {
-    id: '1512499617640-b74ae3e7db25',
-    alt: 'A stylish flat lay with a phone in a case, sunglasses, and notebook on a pink background.'
-  },
-  {
-    id: '1574281591321-4f68a2d1e1c9',
-    alt: 'A phone with a vibrant synthwave retro sunset case.'
-  },
-  {
-    id: '1610792516307-ea5acd9c3b00',
-    alt: 'A person holding a phone with a modern, artistic case against a textured wall.'
-  },
-  {
-    id: '1599582301353-53303c621122',
-    alt: 'A close-up of a sleek and modern carbon fiber phone case.'
-  }
-];
-
-const generateSrcSet = (id: string) => {
-  const baseUrl = `https://images.unsplash.com/photo-${id}`;
-  const params = `q=80&auto=format&fit=crop`;
-  const widths = [640, 768, 1024, 1280, 1536, 1920, 2070];
-  return widths.map(w => `${baseUrl}?${params}&w=${w} ${w}w`).join(', ');
-};
+import { useHero } from '../context/HeroContext';
+import LazyImage from './LazyImage';
 
 const Hero: React.FC = () => {
+  const { heroImages } = useHero();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  // FIX: Replaced NodeJS.Timeout with ReturnType<typeof setTimeout> for browser compatibility.
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const AUTOPLAY_DELAY = 5000;
 
@@ -47,10 +20,12 @@ const Hero: React.FC = () => {
   };
 
   const goToNext = useCallback(() => {
+    if (heroImages.length === 0) return;
     setCurrentImageIndex(prevIndex => (prevIndex + 1) % heroImages.length);
-  }, []);
+  }, [heroImages.length]);
 
   const goToPrev = () => {
+    if (heroImages.length === 0) return;
     setCurrentImageIndex(prevIndex => (prevIndex - 1 + heroImages.length) % heroImages.length);
   };
   
@@ -63,6 +38,17 @@ const Hero: React.FC = () => {
     timeoutRef.current = setTimeout(goToNext, AUTOPLAY_DELAY);
     return () => resetTimeout();
   }, [currentImageIndex, goToNext]);
+  
+  if (heroImages.length === 0) {
+      return (
+          <section className="relative h-screen bg-gray-800 text-white flex items-center justify-center">
+              <div className="text-center">
+                  <h1 className="text-4xl font-bold">Welcome to covercart.in</h1>
+                  <p className="mt-4">Admin: Please add images to the hero section in the admin panel.</p>
+              </div>
+          </section>
+      );
+  }
 
   return (
     <section 
@@ -74,39 +60,34 @@ const Hero: React.FC = () => {
         className="absolute inset-0 z-0 flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
       >
-         {heroImages.map((image, index) => {
-            const defaultSrc = `https://images.unsplash.com/photo-${image.id}?q=80&auto=format&fit=crop&w=1920`;
-            return (
+         {heroImages.map((image, index) => (
               <div
                 key={image.id}
                 className="relative w-full h-full flex-shrink-0"
                 aria-hidden={index !== currentImageIndex}
                 aria-roledescription="slide"
               >
-                  <img 
-                      src={defaultSrc}
-                      srcSet={generateSrcSet(image.id)}
-                      sizes="100vw"
+                  <LazyImage
+                      src={image.url}
                       alt={image.alt}
-                      loading={index === 0 ? 'eager' : 'lazy'}
                       // @ts-ignore
                       fetchPriority={index === 0 ? 'high' : 'auto'}
                       className="w-full h-full object-cover object-center animate-ken-burns"
+                      placeholderClassName="w-full h-full object-cover object-center"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" aria-hidden="true"></div>
               </div>
-            );
-         })}
+            ))}
       </div>
       
       <div className="relative z-10 container mx-auto px-6 text-center">
         <div className="opacity-0 animate-slide-in-bottom" style={{ animationDelay: '0.2s' }}>
-            <h1 className="text-4xl md:text-7xl font-extrabold leading-tight mb-4 drop-shadow-lg tracking-tight">
+            <h1 className="text-4xl md:text-7xl font-extrabold leading-tight mb-4 drop-shadow-xl tracking-tight">
               Style That Speaks.
             </h1>
         </div>
         <div className="opacity-0 animate-slide-in-bottom" style={{ animationDelay: '0.5s' }}>
-            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto drop-shadow-md font-light text-gray-200">
+            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto drop-shadow-lg font-light text-gray-200">
               From runway trends to timeless classics, find the perfect case that's uniquely you.
             </p>
         </div>
@@ -123,14 +104,14 @@ const Hero: React.FC = () => {
       {/* Navigation Arrows */}
       <button 
         onClick={goToPrev}
-        className="absolute top-1/2 left-4 md:left-8 -translate-y-1/2 z-20 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all opacity-0 group-hover:opacity-100"
+        className="absolute top-1/2 left-4 md:left-8 -translate-y-1/2 z-20 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all opacity-0 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"
         aria-label="Previous slide"
       >
         <ChevronLeftIcon className="w-6 h-6 md:w-8 md:h-8" />
       </button>
       <button 
         onClick={goToNext}
-        className="absolute top-1/2 right-4 md:right-8 -translate-y-1/2 z-20 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all opacity-0 group-hover:opacity-100"
+        className="absolute top-1/2 right-4 md:right-8 -translate-y-1/2 z-20 p-3 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/40 transition-all opacity-0 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75"
         aria-label="Next slide"
       >
         <ChevronRightIcon className="w-6 h-6 md:w-8 md:h-8" />

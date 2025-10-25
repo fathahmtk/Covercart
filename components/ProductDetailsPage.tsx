@@ -1,4 +1,6 @@
 
+
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Product, ProductVariant } from '../types';
 import { useCart } from '../context/CartContext';
@@ -14,6 +16,7 @@ import ImageZoom from './ImageZoom';
 import LazyImage from './LazyImage';
 import UserGallery from './UserGallery';
 import RelatedProducts from './RelatedProducts';
+import PersonalizedRecommendations from './PersonalizedRecommendations';
 import { useSEO } from '../hooks/useSEO';
 import Lightbox from './Lightbox';
 import { FacebookIcon } from './icons/FacebookIcon';
@@ -52,7 +55,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   const { average, count } = getAverageRating(product.id);
   
   // SEO & Structured Data
-  const seoTitle = `${product.name} | covercove.com - Premium Mobile Covers`;
+  const seoTitle = `${product.name} | covercart.in - Premium Mobile Covers`;
   const seoDescription = product.description.substring(0, 160);
   const totalStock = product.variants?.reduce((sum, v) => sum + v.stock, 0) ?? product.stock ?? 0;
   
@@ -87,7 +90,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
   useSEO({
     title: seoTitle,
     description: seoDescription,
-    keywords: `mobile cover, phone case, ${product.name}, ${product.category}, covercove.com`,
+    keywords: `mobile cover, phone case, ${product.name}, ${product.category}, covercart.in`,
     schema: productSchema,
   });
 
@@ -139,7 +142,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
 
   const handleShare = (platform: 'facebook' | 'twitter' | 'whatsapp' | 'copy') => {
     const url = window.location.href;
-    const text = `Check out this awesome phone case: ${product.name} from covercove.com!`;
+    const text = `Check out this awesome phone case: ${product.name} from covercart.in!`;
 
     if (platform === 'copy') {
       navigator.clipboard.writeText(url).then(() => {
@@ -306,6 +309,13 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product, onBack
       </div>
 
       <UserGallery product={product} />
+      <PersonalizedRecommendations
+        title="You Might Also Like"
+        currentProductId={product.id}
+        onProductClick={onProductClick}
+        onQuickViewClick={onQuickViewClick}
+        bgColor="bg-[--color-bg-subtle]"
+      />
       <RelatedProducts 
         currentProduct={product}
         onProductClick={onProductClick}

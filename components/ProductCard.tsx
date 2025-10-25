@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
@@ -63,7 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
 
   return (
     <div 
-      className="bg-[--color-bg] rounded-xl shadow-[var(--shadow-elevation-low)] hover:shadow-[var(--shadow-elevation-medium)] overflow-hidden border border-[--color-border] h-full flex flex-col transition-all duration-300 group hover:-translate-y-1"
+      className="bg-[--color-bg] rounded-xl shadow-[var(--shadow-elevation-low)] hover:shadow-[var(--shadow-elevation-medium)] overflow-hidden border border-[--color-border] h-full flex flex-col transition-all duration-300 group hover:-translate-y-1 hover:scale-[1.01]"
     >
       <div className="relative overflow-hidden">
         <button onClick={() => onProductClick(product)} className="w-full block">
@@ -81,12 +82,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
         <div className="absolute top-3 right-3 flex flex-col gap-2 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button 
             onClick={handleWishlistToggle} 
-            className={`p-2.5 rounded-full backdrop-blur-sm transition-colors ${isInWishlist ? 'bg-red-500/80 text-white' : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-200 hover:bg-red-500 hover:text-white'}`}
+            className={`p-2.5 rounded-full backdrop-blur-sm transition-colors ${isInWishlist ? 'bg-red-500/80 text-white' : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-200 hover:bg-red-500/90 hover:text-white'}`}
             aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
             title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
           >
             <HeartIcon filled={isInWishlist} />
           </button>
+        </div>
+        {/* Quick View Button */}
+        <div className="absolute bottom-3 right-3 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={handleQuickView}
+              className="p-2.5 rounded-full backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-200 hover:bg-teal-500/90 hover:text-white transition-colors"
+              aria-label="Quick view product"
+              title="Quick view"
+            >
+              <EyeIcon />
+            </button>
         </div>
       </div>
       <div className="p-5 flex flex-col flex-grow">
@@ -96,6 +108,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
                 {product.name}
             </button>
         </h3>
+        {/* Added line-clamp-3 for consistent height */}
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-3">{product.description}</p> 
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             {count > 0 ? (
                 <>
@@ -109,14 +123,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
         <div className="mt-auto pt-4 flex justify-between items-center">
           <p className="text-xl font-extrabold text-teal-600 dark:text-teal-400">₹{product.price}</p>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleQuickView}
-              className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-teal-500 hover:text-white transition-colors"
-              aria-label="Quick view"
-              title="Quick view"
-            >
-              <EyeIcon />
-            </button>
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}

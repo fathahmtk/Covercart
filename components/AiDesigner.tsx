@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { generateImageWithGemini } from '../services/geminiService';
 import { SparklesIcon } from './icons/SparklesIcon';
@@ -128,6 +129,7 @@ const AiDesigner: React.FC = () => {
                   placeholder="e.g., A majestic lion wearing sunglasses in a synthwave style"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
+                  aria-label="Enter your design idea for AI generation"
                 />
 
                 <div className="mt-6">
@@ -144,6 +146,7 @@ const AiDesigner: React.FC = () => {
                                     ? 'bg-[--color-primary] text-white shadow'
                                     : 'bg-[--color-bg-subtle] dark:bg-gray-700 text-[--color-text-muted] hover:bg-teal-100 dark:hover:bg-gray-600'
                                 }`}
+                                aria-label={`Preview on ${model}`}
                             >
                                 {model}
                             </button>
@@ -155,6 +158,7 @@ const AiDesigner: React.FC = () => {
                   onClick={handleGenerate}
                   disabled={isLoading}
                   className="mt-6 w-full flex items-center justify-center bg-gradient-to-r from-[--color-primary] to-teal-400 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow hover:shadow-lg"
+                  aria-label="Generate design with AI"
                 >
                   {isLoading ? (
                     <>
@@ -180,7 +184,7 @@ const AiDesigner: React.FC = () => {
                 <PhoneFrame model={selectedModel}>
                   {isLoading && (
                       <div className="w-full h-full flex items-center justify-center bg-gray-700/50">
-                          <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-[--color-primary]"></div>
+                          <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-[--color-primary] border-t-transparent"></div>
                       </div>
                   )}
                   {generatedImage && (

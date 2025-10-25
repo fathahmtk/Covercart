@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -82,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
           <div className="flex items-center space-x-8">
               <a href="#/" onClick={handleLogoClick} className="flex items-center space-x-2 text-2xl font-bold text-[--color-text]">
               <LogoIcon />
-              <span style={{fontFamily: 'var(--font-heading)'}}>covercove.com</span>
+              <span style={{fontFamily: 'var(--font-heading)'}}>covercart.in</span>
               </a>
               <div className="hidden md:flex items-center space-x-6">
                   <a href="#products" className="text-[--color-text-muted] hover:text-[--color-primary] transition-colors font-medium">Products</a>
@@ -93,9 +95,9 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
           </div>
           <div className="flex items-center space-x-1 sm:space-x-4">
             {/* Desktop Search Bar */}
-            <div className="relative hidden md:block">
+            <div className="relative hidden md:block group">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="text-gray-400" />
+                <SearchIcon className="text-gray-400 group-focus-within:text-[--color-primary]" />
               </span>
               <input
                 type="text"
@@ -112,15 +114,15 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
             </div>
 
             {/* Mobile Search Toggle */}
-            <button onClick={openMobileSearch} className="md:hidden text-[--color-text-muted] hover:text-[--color-primary] transition-colors p-2" aria-label="Open search">
+            <button onClick={openMobileSearch} className="md:hidden text-[--color-text-muted] hover:text-[--color-primary] transition-colors p-2 rounded-full hover:bg-[--color-bg-subtle] dark:hover:bg-gray-700" aria-label="Open search">
               <SearchIcon className="w-6 h-6" />
             </button>
             
-            <button onClick={toggleTheme} className="text-[--color-text-muted] hover:text-amber-500 dark:hover:text-amber-400 transition-colors p-2" aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+            <button onClick={toggleTheme} className="text-[--color-text-muted] hover:text-amber-500 dark:hover:text-amber-400 transition-colors p-2 rounded-full hover:bg-[--color-bg-subtle] dark:hover:bg-gray-700" aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
                 {theme === 'light' ? <MoonIcon className="w-6 h-6" /> : <SunIcon className="w-6 h-6" />}
             </button>
 
-            <button onClick={onWishlistClick} className="relative text-[--color-text-muted] hover:text-red-500 dark:hover:text-red-400 transition-colors p-1">
+            <button onClick={onWishlistClick} className="relative text-[--color-text-muted] hover:text-red-500 dark:hover:text-red-400 transition-colors p-1 rounded-full hover:bg-[--color-bg-subtle] dark:hover:bg-gray-700">
               <HeartIcon />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
@@ -128,7 +130,7 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
                 </span>
               )}
             </button>
-            <button onClick={onCartClick} className="relative text-[--color-text-muted] hover:text-[--color-primary] transition-colors p-1">
+            <button onClick={onCartClick} className="relative text-[--color-text-muted] hover:text-[--color-primary] transition-colors p-1 rounded-full hover:bg-[--color-bg-subtle] dark:hover:bg-gray-700">
               <ShoppingCartIcon />
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
@@ -137,7 +139,7 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onWishlistClick, searchQue
               )}
             </button>
             {/* Mobile Menu Button */}
-            <button onClick={toggleMobileMenu} className="p-2 text-[--color-text-muted] hover:text-[--color-primary] md:hidden" aria-label="Open menu" aria-expanded={isMobileMenuOpen}>
+            <button onClick={toggleMobileMenu} className="p-2 text-[--color-text-muted] hover:text-[--color-primary] md:hidden rounded-full hover:bg-[--color-bg-subtle] dark:hover:bg-gray-700" aria-label="Open menu" aria-expanded={isMobileMenuOpen}>
               <Bars3Icon className="w-7 h-7" />
             </button>
           </div>
