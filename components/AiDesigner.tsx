@@ -5,9 +5,10 @@ import { generateImageWithGemini } from '../services/geminiService';
 import { SparklesIcon } from './icons/SparklesIcon';
 import AnimateOnScroll from './AnimateOnScroll';
 import LazyImage from './LazyImage';
+import { ArrowPathIcon } from './icons/ArrowPathIcon';
 
-type PhoneModel = 'iPhone 15 Pro' | 'Galaxy S24' | 'Pixel 8 Pro' | 'Generic';
-const phoneModels: PhoneModel[] = ['iPhone 15 Pro', 'Galaxy S24', 'Pixel 8 Pro', 'Generic'];
+type PhoneModel = 'iPhone 15 Pro' | 'Galaxy S24' | 'Pixel 8 Pro';
+const phoneModels: PhoneModel[] = ['iPhone 15 Pro', 'Galaxy S24', 'Pixel 8 Pro'];
 
 const sampleDesigns = [
   {
@@ -60,112 +61,97 @@ const AiDesigner: React.FC = () => {
     setIsLoading(false);
   };
 
-
   const PhoneFrame: React.FC<{ model: PhoneModel; children: React.ReactNode }> = ({ model, children }) => {
-    // Base classes for the phone's outer chassis
-    let frameClasses = "relative w-44 h-88 sm:w-48 sm:h-96 bg-gray-800 dark:bg-gray-900 shadow-2xl transition-all duration-300 flex items-center justify-center p-1.5";
+    let frameClasses = "relative w-[280px] h-[570px] bg-gray-800 dark:bg-gray-900 shadow-2xl transition-all duration-300 flex items-center justify-center p-2.5";
     let screenClasses = "relative w-full h-full bg-black overflow-hidden flex items-center justify-center shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)]";
     let cameraCutout = null;
     let sideButtons = null;
 
     switch (model) {
       case 'iPhone 15 Pro':
-        frameClasses += " rounded-[3.5rem] border-2 border-gray-600 dark:border-gray-700";
-        screenClasses += " rounded-[3.2rem]";
-        // Dynamic Island
+        frameClasses += " rounded-[44px] border-2 border-gray-600 dark:border-gray-700";
+        screenClasses += " rounded-[36px]";
         cameraCutout = <div className="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-7 bg-black rounded-full z-20"></div>;
         sideButtons = (
           <>
-            {/* Volume Rocker */}
-            <div className="absolute -left-1 top-24 w-1 h-6 bg-gray-700 dark:bg-gray-800 rounded-l-sm"></div>
-            <div className="absolute -left-1 top-32 w-1 h-6 bg-gray-700 dark:bg-gray-800 rounded-l-sm"></div>
-            {/* Power Button */}
-            <div className="absolute -right-1 top-28 w-1 h-12 bg-gray-700 dark:bg-gray-800 rounded-r-sm"></div>
+            <div className="absolute -left-1 top-28 w-1 h-8 bg-gray-700 dark:bg-gray-800 rounded-l-sm"></div>
+            <div className="absolute -left-1 top-40 w-1 h-14 bg-gray-700 dark:bg-gray-800 rounded-l-sm"></div>
+            <div className="absolute -right-1 top-36 w-1 h-20 bg-gray-700 dark:bg-gray-800 rounded-r-sm"></div>
           </>
         );
         break;
       case 'Galaxy S24':
-        frameClasses += " rounded-[2.8rem] border-2 border-gray-500 dark:border-gray-600";
-        screenClasses += " rounded-[2.5rem]";
-        // Centered hole-punch camera
+        frameClasses += " rounded-[38px] border-2 border-gray-500 dark:border-gray-600";
+        screenClasses += " rounded-[32px]";
         cameraCutout = <div className="absolute top-5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black rounded-full z-20 border-2 border-gray-800"></div>;
         sideButtons = (
             <>
-              {/* Volume Rocker */}
-              <div className="absolute -left-1 top-24 w-1 h-12 bg-gray-600 dark:bg-gray-700 rounded-l-sm"></div>
-              {/* Power Button */}
-              <div className="absolute -right-1 top-28 w-1 h-10 bg-gray-600 dark:bg-gray-700 rounded-r-sm"></div>
+              <div className="absolute -left-1 top-28 w-1 h-16 bg-gray-600 dark:bg-gray-700 rounded-l-sm"></div>
+              <div className="absolute -right-1 top-36 w-1 h-12 bg-gray-600 dark:bg-gray-700 rounded-r-sm"></div>
             </>
           );
         break;
       case 'Pixel 8 Pro':
-        frameClasses += " rounded-[2.5rem] border-2 border-gray-600 dark:border-gray-700";
-        screenClasses += " rounded-[2.2rem]";
-        // Centered hole-punch camera
+        frameClasses += " rounded-[36px] border-2 border-gray-600 dark:border-gray-700";
+        screenClasses += " rounded-[28px]";
         cameraCutout = <div className="absolute top-5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black rounded-full z-20 border-2 border-gray-800"></div>;
         sideButtons = (
             <>
-              {/* Volume Rocker */}
-              <div className="absolute -right-1 top-32 w-1 h-12 bg-gray-700 dark:bg-gray-800 rounded-r-sm"></div>
-              {/* Power Button */}
-              <div className="absolute -right-1 top-20 w-1 h-8 bg-gray-700 dark:bg-gray-800 rounded-r-sm"></div>
+              <div className="absolute -right-1 top-40 w-1 h-16 bg-gray-700 dark:bg-gray-800 rounded-r-sm"></div>
+              <div className="absolute -right-1 top-28 w-1 h-10 bg-gray-700 dark:bg-gray-800 rounded-r-sm"></div>
             </>
           );
-        break;
-      default: // Generic
-        frameClasses += " rounded-[2.5rem] border-4 border-gray-500";
-        screenClasses += " rounded-[2rem]";
-        cameraCutout = <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-b-lg z-20"></div>;
         break;
     }
     
     return (
-      <div className={frameClasses}>
-        {sideButtons}
-        <div className={screenClasses}>
-            {cameraCutout}
-            {/* The actual design image goes here */}
-            <div className="absolute inset-0 z-10">
-                {children}
-            </div>
+      <div className="scale-75 sm:scale-90 lg:scale-100">
+        <div className={frameClasses}>
+          {sideButtons}
+          <div className={screenClasses}>
+              {cameraCutout}
+              <div className="absolute inset-0 z-10">
+                  {children}
+              </div>
+          </div>
         </div>
       </div>
     );
   };
 
   return (
-    <section id="ai-designer" className="py-24 bg-[--color-bg]">
+    <section id="ai-designer" className="py-24 bg-[--color-bg-primary]">
       <div className="container mx-auto px-6">
         <AnimateOnScroll className="fade-in-up">
-          <h2 className="text-4xl font-bold text-center mb-4 text-[--color-text] tracking-tight">Design with AI</h2>
-          <p className="text-center text-[--color-text-muted] mb-12 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-4 text-[--color-text-primary] tracking-tight">Design with AI</h2>
+          <p className="text-center text-[--color-text-secondary] mb-12 max-w-2xl mx-auto">
             Unleash your creativity! Describe any design you can imagine, and our AI will bring it to life on a phone case.
           </p>
 
-          <div className="flex flex-col lg:flex-row gap-10 items-center justify-center">
+          <div className="flex flex-col lg:flex-row gap-12 items-center justify-center">
             {/* Controls */}
-            <div className="w-full lg:w-1/2">
-              <div className="bg-[--color-bg] p-8 rounded-xl shadow-[var(--shadow-elevation-medium)] border border-[--color-border]">
-                <label htmlFor="ai-prompt" className="block text-lg font-semibold mb-2 text-[--color-text]">
-                  What's your vision?
+            <div className="w-full lg:w-1/2 xl:w-5/12">
+              <div className="bg-[--color-bg-primary] p-8 rounded-2xl shadow-[var(--shadow-elevation-medium)] border border-[--color-border]">
+                <label htmlFor="ai-prompt" className="block text-lg font-semibold mb-2 text-[--color-text-primary]">
+                  1. Describe Your Vision
                 </label>
                 <textarea
                   id="ai-prompt"
-                  rows={3}
-                  className="w-full p-3 border border-[--color-border] rounded-lg bg-[--color-bg-subtle] focus:ring-2 focus:ring-[--color-primary] focus:border-[--color-primary] transition"
+                  rows={4}
+                  className="input-style"
                   placeholder="e.g., A majestic lion wearing sunglasses in a synthwave style"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   aria-label="Enter your design idea for AI generation"
                 />
                  <div className="mt-4">
-                  <p className="text-sm font-semibold text-[--color-text-muted] mb-2">Or try a sample:</p>
-                  <div className="flex flex-wrap gap-2">
+                  <p className="text-sm font-semibold text-[--color-text-secondary] mb-2">Not sure? Try a sample:</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {sampleDesigns.map((sample, index) => (
                       <button
                         key={index}
                         onClick={() => handleSampleClick(sample)}
-                        className="rounded-lg overflow-hidden w-16 h-16 border-2 border-transparent hover:border-[--color-primary] focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary] transition"
+                        className="rounded-lg overflow-hidden border-2 border-transparent hover:border-[--color-primary] focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary] transition aspect-square"
                         title={sample.prompt}
                         aria-label={`Select sample design: ${sample.prompt}`}
                       >
@@ -176,8 +162,8 @@ const AiDesigner: React.FC = () => {
                 </div>
 
                 <div className="mt-6">
-                    <label className="block text-lg font-semibold mb-3 text-[--color-text]">
-                        Preview on:
+                    <label className="block text-lg font-semibold mb-3 text-[--color-text-primary]">
+                        2. Choose a Phone Model
                     </label>
                     <div className="flex flex-wrap gap-2">
                         {phoneModels.map(model => (
@@ -186,8 +172,8 @@ const AiDesigner: React.FC = () => {
                                 onClick={() => setSelectedModel(model)}
                                 className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
                                     selectedModel === model
-                                    ? 'bg-[--color-primary] text-white shadow'
-                                    : 'bg-[--color-bg-subtle] dark:bg-gray-700 text-[--color-text-muted] hover:bg-teal-100 dark:hover:bg-gray-600'
+                                    ? 'bg-[--color-primary] text-[--color-primary-text] shadow'
+                                    : 'bg-[--color-bg-tertiary] text-[--color-text-secondary] hover:bg-gray-200 dark:hover:bg-[--color-bg-tertiary]'
                                 }`}
                                 aria-label={`Preview on ${model}`}
                             >
@@ -200,15 +186,12 @@ const AiDesigner: React.FC = () => {
                 <button
                   onClick={handleGenerate}
                   disabled={isLoading}
-                  className="mt-6 w-full flex items-center justify-center bg-gradient-to-r from-[--color-primary] to-teal-400 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow hover:shadow-lg"
+                  className="mt-8 w-full flex items-center justify-center bg-gradient-to-r from-[--color-primary] to-teal-500 text-white font-bold py-4 px-6 rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[var(--shadow-elevation-medium)] hover:shadow-lg text-lg"
                   aria-label="Generate design with AI"
                 >
                   {isLoading ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
+                      <ArrowPathIcon className="animate-spin -ml-1 mr-3 h-5 w-5" />
                       Generating...
                     </>
                   ) : (
@@ -223,7 +206,7 @@ const AiDesigner: React.FC = () => {
             </div>
 
             {/* Preview */}
-            <div className="w-full lg:w-1/3 flex justify-center items-center">
+            <div className="w-full lg:w-1/2 xl:w-1/3 flex justify-center items-center">
                 <PhoneFrame model={selectedModel}>
                   {isLoading && (
                       <div className="w-full h-full flex items-center justify-center bg-gray-700/50">

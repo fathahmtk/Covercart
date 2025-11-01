@@ -28,11 +28,11 @@ const FilterSection: React.FC<{ title: string; isOpen: boolean; onToggle: () => 
     <div className="border-b border-[--color-border] last:border-b-0">
       <button 
         onClick={onToggle} 
-        className="w-full flex justify-between items-center py-4 font-semibold text-[--color-text] hover:bg-[--color-bg-subtle]/50 rounded-md px-2 -mx-2"
+        className="w-full flex justify-between items-center py-4 font-semibold text-[--color-text-primary] hover:bg-[--color-bg-secondary]/50 rounded-md px-2 -mx-2"
         aria-expanded={isOpen}
       >
         <span>{title}</span>
-        <ChevronDownIcon className={`w-5 h-5 transition-transform duration-300 ${!isOpen ? '-rotate-90' : ''}`} />
+        <ChevronDownIcon className={`w-5 h-5 transition-transform duration-300 text-[--color-text-muted] ${!isOpen ? '-rotate-90' : ''}`} />
       </button>
       <div className={`transition-[max-height,padding-bottom] duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[500px] pb-4' : 'max-h-0'}`}>
         {children}
@@ -57,7 +57,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   onReset,
   resultCount,
 }) => {
-  const [openSections, setOpenSections] = useState({ category: true, price: true, color: true });
+  const [openSections, setOpenSections] = useState({ category: true, price: true, color: false });
   const { categories: availableCategories } = useCategory();
   const categories = ['All', ...availableCategories];
 
@@ -85,17 +85,17 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   };
 
   return (
-    <div className="bg-[--color-bg] p-6 rounded-lg mb-12 shadow-[var(--shadow-elevation-low)] border border-[--color-border]">
+    <div className="bg-[--color-bg-primary] p-6 rounded-2xl mb-12 shadow-[var(--shadow-elevation-medium)] border border-[--color-border]">
       {/* Top Row: Title & Sorting */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
-        <h3 className="text-2xl font-bold text-[--color-text]">Filters</h3>
+        <h3 className="text-2xl font-bold text-[--color-text-primary]">Filters</h3>
         <div className="flex items-center gap-2 mt-3 sm:mt-0">
-          <label htmlFor="sort-by" className="text-sm font-medium text-[--color-text-muted] whitespace-nowrap">Sort by:</label>
+          <label htmlFor="sort-by" className="text-sm font-medium text-[--color-text-secondary] whitespace-nowrap">Sort by:</label>
           <select
             id="sort-by"
             value={selectedSort}
             onChange={handleSortChange}
-            className="w-full sm:w-auto p-2 border border-[--color-border] rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-[--color-primary] focus:border-[--color-primary]"
+            className="w-full sm:w-auto p-2 border border-[--color-border] rounded-md bg-[--color-bg-secondary] text-sm focus:ring-2 focus:ring-[--color-primary] focus:border-[--color-primary]"
           >
             {sortOptions.map(option => (
               <option key={option.value} value={option.value}>{option.label}</option>
@@ -114,8 +114,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                 onClick={() => onCategoryChange(category)}
                 className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
                   selectedCategory === category
-                    ? 'bg-[--color-primary] text-white shadow'
-                    : 'bg-[--color-bg-subtle] dark:bg-gray-700 text-[--color-text-muted] hover:bg-teal-100 dark:hover:bg-gray-600'
+                    ? 'bg-[--color-primary] text-[--color-primary-text] shadow'
+                    : 'bg-[--color-bg-tertiary] text-[--color-text-secondary] hover:bg-gray-200 dark:hover:bg-[--color-bg-tertiary]'
                 }`}
               >
                 {category}
@@ -164,12 +164,12 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 
       {/* Bottom Row: Results & Reset */}
       <div className="mt-6 pt-4 border-t border-[--color-border] flex justify-between items-center">
-        <p className="text-sm font-semibold text-[--color-text-muted]">
+        <p className="text-sm font-semibold text-[--color-text-secondary]">
           {resultCount} Product{resultCount !== 1 && 's'} Found
         </p>
         <button
           onClick={onReset}
-          className="text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-full transition-colors border border-gray-300 dark:border-gray-600"
+          className="text-sm font-medium text-[--color-text-secondary] bg-transparent hover:bg-[--color-bg-tertiary] px-4 py-2 rounded-full transition-colors border border-[--color-border]"
         >
           Reset Filters
         </button>

@@ -9,6 +9,7 @@ import { Product } from '../types';
 import { useProducts } from '../context/ProductContext';
 import ProductCarousel from './ProductCarousel';
 import PersonalizedRecommendations from './PersonalizedRecommendations';
+import AiDesigner from './AiDesigner';
 
 interface HomePageProps {
   searchQuery: string;
@@ -51,18 +52,19 @@ const HomePage: React.FC<HomePageProps> = ({ searchQuery, onProductClick, onQuic
         onProductClick={onProductClick}
         onQuickViewClick={onQuickViewClick}
       />
+      <AiDesigner />
       <ProductCarousel
         title="New Arrivals"
         products={newArrivals}
         onProductClick={onProductClick}
         onQuickViewClick={onQuickViewClick}
-        bgColor="bg-[--color-bg-subtle]"
+        bgColor="bg-[--color-bg-secondary]"
       />
       <PersonalizedRecommendations
         title="Just For You"
         onProductClick={onProductClick}
         onQuickViewClick={onQuickViewClick}
-        bgColor="bg-white dark:bg-gray-950"
+        bgColor="bg-[--color-bg-primary]"
       />
       <ProductList 
         searchQuery={searchQuery} 

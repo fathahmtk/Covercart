@@ -127,14 +127,14 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
   };
 
   return (
-    <section id="products" className="py-24 bg-[--color-bg-subtle]">
+    <section id="products" className="py-24 bg-[--color-bg-tertiary]">
       <div className="container mx-auto px-6">
         <AnimateOnScroll className="fade-in-up">
             <div className="text-center mb-4 relative">
-                <h2 className="text-4xl font-bold text-[--color-text] tracking-tight">Our Collection</h2>
+                <h2 className="text-4xl font-bold text-[--color-text-primary] tracking-tight">Our Collection</h2>
             </div>
 
-            <p className="text-center text-[--color-text-muted] mb-12">
+            <p className="text-center text-[--color-text-secondary] mb-12">
               Find the perfect case that matches your style.
             </p>
 
@@ -156,13 +156,13 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
         </AnimateOnScroll>
         
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
               <ProductCardSkeleton key={index} />
             ))}
           </div>
         ) : paginatedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {paginatedProducts.map((product, index) => (
               <AnimateOnScroll key={product.id} delay={index * 100} className="fade-in-up h-full">
                 <ProductCard 
@@ -178,8 +178,8 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
             </svg>
-            <h3 className="mt-2 text-xl font-semibold text-gray-900 dark:text-gray-200">No Products Found</h3>
-            <p className="mt-1 text-gray-500 dark:text-gray-400">
+            <h3 className="mt-2 text-xl font-semibold text-[--color-text-primary]">No Products Found</h3>
+            <p className="mt-1 text-[--color-text-secondary]">
               Try adjusting your search or filters to find what you're looking for.
             </p>
           </div>
@@ -190,17 +190,17 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
             <button
               onClick={handlePrevPage}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-transparent border border-[--color-primary] text-[--color-primary] rounded-md shadow-sm text-sm font-medium hover:bg-[--color-primary] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-transparent border border-[--color-primary] text-[--color-primary] rounded-md shadow-sm text-sm font-medium hover:bg-[--color-primary] hover:text-[--color-primary-text] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               &larr; Previous
             </button>
-            <span className="text-sm text-[--color-text-muted]">
+            <span className="text-sm text-[--color-text-secondary]">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={handleNextPage}
               disabled={currentPage >= totalPages}
-              className="px-4 py-2 bg-transparent border border-[--color-primary] text-[--color-primary] rounded-md shadow-sm text-sm font-medium hover:bg-[--color-primary] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-transparent border border-[--color-primary] text-[--color-primary] rounded-md shadow-sm text-sm font-medium hover:bg-[--color-primary] hover:text-[--color-primary-text] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Next &rarr;
             </button>

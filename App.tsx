@@ -21,6 +21,7 @@ import ProductDetailsSkeleton from './components/ProductDetailsSkeleton';
 import { ToastContainer } from './components/ToastProvider';
 import OrderHistoryPage from './components/OrderHistoryPage';
 import GalleryPage from './components/GalleryPage';
+import AiDesignerPage from './components/AiDesignerPage';
 
 const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -129,6 +130,10 @@ const App: React.FC = () => {
         return <GalleryPage onBack={handleBackToList} onProductClick={handleProductClick} />;
     }
 
+    if (currentPath === '#/ai-designer') {
+      return <AiDesignerPage onBack={handleBackToList} />;
+    }
+
 
     // Default to home page
     return (
@@ -141,7 +146,7 @@ const App: React.FC = () => {
   }, [currentPath, products, debouncedSearchQuery, loading]);
 
   return (
-    <div className="min-h-screen text-gray-800 dark:text-gray-200 font-sans antialiased">
+    <div className="min-h-screen bg-[--color-bg-primary] text-[--color-text-primary] font-sans antialiased">
       <Header
         onCartClick={() => setIsCartOpen(true)}
         onWishlistClick={() => setIsWishlistOpen(true)}

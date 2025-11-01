@@ -64,14 +64,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
 
   return (
     <div 
-      className="bg-[--color-bg] rounded-xl shadow-[var(--shadow-elevation-low)] hover:shadow-[var(--shadow-elevation-medium)] overflow-hidden border border-[--color-border] h-full flex flex-col transition-all duration-300 group hover:-translate-y-1 hover:scale-[1.01]"
+      className="bg-[--color-bg-primary] rounded-2xl shadow-[var(--shadow-elevation-low)] hover:shadow-[var(--shadow-elevation-medium)] overflow-hidden border border-[--color-border] h-full flex flex-col transition-all duration-300 group hover:-translate-y-1"
     >
       <div className="relative overflow-hidden">
         <button onClick={() => onProductClick(product)} className="w-full block">
           <LazyImage 
             src={product.imageUrl} 
             alt={`${product.name} - ${product.category} Case`} 
-            className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-500"
           />
         </button>
         {isOutOfStock && (
@@ -93,7 +93,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
         <div className="absolute bottom-3 right-3 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button
               onClick={handleQuickView}
-              className="p-2.5 rounded-full backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-200 hover:bg-teal-500/90 hover:text-white transition-colors"
+              className="p-2.5 rounded-full backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 text-[--color-text-secondary] dark:text-gray-200 hover:bg-[--color-primary]/90 hover:text-white transition-colors"
               aria-label="Quick view product"
               title="Quick view"
             >
@@ -102,31 +102,31 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick, onQu
         </div>
       </div>
       <div className="p-5 flex flex-col flex-grow">
-        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{product.category}</span>
-        <h3 className="text-lg font-bold my-1 text-gray-900 dark:text-white hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
+        <span className="text-xs text-[--color-text-muted] uppercase tracking-wider">{product.category}</span>
+        <h3 className="text-lg font-bold my-1 text-[--color-text-primary] hover:text-[--color-primary] transition-colors">
             <button onClick={() => onProductClick(product)} className="text-left w-full">
                 {product.name}
             </button>
         </h3>
-        {/* Added line-clamp-3 for consistent height */}
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-3">{product.description}</p> 
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+        {/* Added line-clamp-2 for consistent height */}
+        <p className="text-sm text-[--color-text-secondary] mb-2 line-clamp-2 flex-grow">{product.description}</p> 
+        <div className="flex items-center gap-2 text-sm text-[--color-text-muted]">
             {count > 0 ? (
                 <>
                     <StarRating rating={average} />
                     <span>({count})</span>
                 </>
             ) : (
-                <span className="italic">No reviews yet</span>
+                <span className="italic text-xs">No reviews yet</span>
             )}
         </div>
-        <div className="mt-auto pt-4 flex justify-between items-center">
-          <p className="text-xl font-extrabold text-teal-600 dark:text-teal-400">₹{product.price}</p>
+        <div className="mt-4 pt-4 flex justify-between items-center">
+          <p className="text-2xl font-extrabold text-[--color-primary]">₹{product.price}</p>
           <div className="flex items-center gap-2">
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className="p-2.5 rounded-full bg-gray-800 text-white dark:bg-teal-600 dark:hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-3 rounded-full bg-[--color-primary] text-[--color-primary-text] hover:bg-[--color-primary-hover] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={hasVariants ? 'Select options' : 'Add to cart'}
               title={hasVariants ? 'Select options' : 'Add to cart'}
             >
