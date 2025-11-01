@@ -1,11 +1,12 @@
 
+
 import React, { useState } from 'react';
 import { CheckIcon } from './icons/CheckIcon';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
 import RangeSlider from './RangeSlider';
+import { useCategory } from '../context/CategoryContext';
 
 interface ProductFiltersProps {
-  categories: string[];
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   priceRange: { min: number, max: number };
@@ -42,7 +43,6 @@ const FilterSection: React.FC<{ title: string; isOpen: boolean; onToggle: () => 
 
 
 const ProductFilters: React.FC<ProductFiltersProps> = ({
-  categories,
   selectedCategory,
   onCategoryChange,
   priceRange,
@@ -58,6 +58,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   resultCount,
 }) => {
   const [openSections, setOpenSections] = useState({ category: true, price: true, color: true });
+  const { categories: availableCategories } = useCategory();
+  const categories = ['All', ...availableCategories];
 
   const toggleSection = (section: 'category' | 'color' | 'price') => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));

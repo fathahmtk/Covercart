@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
-const HERO_IMAGES_STORAGE_KEY = 'covercove-hero-images';
+const HERO_IMAGES_STORAGE_key = 'covercove-hero-images';
 
 export interface HeroImage {
   id: string;
@@ -13,6 +13,7 @@ interface HeroContextType {
   heroImages: HeroImage[];
   setHeroImages: (images: HeroImage[]) => void;
   addImage: (image: Omit<HeroImage, 'id'>) => void;
+  updateImage: (id: string, data: { url: string; alt: string }) => void;
   removeImage: (id: string) => void;
 }
 
@@ -48,12 +49,12 @@ const DEFAULT_HERO_IMAGES: HeroImage[] = [
 
 const loadHeroImagesFromStorage = (): HeroImage[] => {
   try {
-    const storedImages = localStorage.getItem(HERO_IMAGES_STORAGE_KEY);
+    const storedImages = localStorage.getItem(HERO_IMAGES_STORAGE_key);
     if (storedImages) {
       return JSON.parse(storedImages);
     }
     // Seed with default images if nothing is stored
-    localStorage.setItem(HERO_IMAGES_STORAGE_KEY, JSON.stringify(DEFAULT_HERO_IMAGES));
+    localStorage.setItem(HERO_IMAGES_STORAGE_key, JSON.stringify(DEFAULT_HERO_IMAGES));
     return DEFAULT_HERO_IMAGES;
   } catch (error) {
     console.error("Failed to access hero images from localStorage", error);
@@ -66,7 +67,7 @@ export const HeroProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     try {
-      localStorage.setItem(HERO_IMAGES_STORAGE_KEY, JSON.stringify(heroImages));
+      localStorage.setItem(HERO_IMAGES_STORAGE_key, JSON.stringify(heroImages));
     } catch (error) {
       console.error("Failed to save hero images to localStorage", error);
     }
@@ -77,14 +78,19 @@ export const HeroProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setHeroImages(prev => [...prev, newImage]);
   };
 
+  const updateImage = (id: string, data: { url: string; alt: string }) => {
+    setHeroImages(prev => prev.map(img => (img.id === id ? { ...img, ...data } : img)));
+  };
+
   const removeImage = (id: string) => {
     setHeroImages(prev => prev.filter(img => img.id !== id));
   };
   
   const value = {
     heroImages,
-    setHeroImages, // Exposing setHeroImages for drag-and-drop reordering if needed later
+    setHeroImages,
     addImage,
+    updateImage,
     removeImage,
   };
 

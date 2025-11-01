@@ -7,6 +7,8 @@ const REVIEWS_STORAGE_KEY = 'covercove-reviews';
 interface ReviewsContextType {
   reviews: Record<string, Review[]>;
   addReview: (productId: number, reviewData: { name: string; rating: number; comment: string }) => void;
+  updateReview: (productId: number, reviewId: string, reviewData: Partial<{ name: string; rating: number; comment: string }>) => void;
+  deleteReview: (productId: number, reviewId: string) => void;
   getReviewsForProduct: (productId: number) => Review[];
   getAverageRating: (productId: number) => { average: number; count: number };
 }
@@ -53,6 +55,40 @@ export const ReviewsProvider: React.FC<{ children: ReactNode }> = ({ children })
     });
   };
 
+  const updateReview = (productId: number, reviewId: string, reviewData: Partial<{ name: string; rating: number; comment: string }>) => {
+    setReviews(prevReviews => {
+        const productReviews = prevReviews[productId] || [];
+        const updatedReviews = productReviews.map(review => {
+            if (review.id === reviewId) {
+                return { ...review, ...reviewData };
+            }
+            return review;
+        });
+        return {
+            ...prevReviews,
+            [productId]: updatedReviews,
+        };
+    });
+  };
+  
+  const deleteReview = (productId: number, reviewId: string) => {
+    setReviews(prevReviews => {
+        const productReviews = prevReviews[productId] || [];
+        const updatedReviews = productReviews.filter(review => review.id !== reviewId);
+        
+        if (updatedReviews.length > 0) {
+            return {
+                ...prevReviews,
+                [productId]: updatedReviews,
+            };
+        } else {
+            // If no reviews are left for the product, remove the product key
+            const { [productId]: _, ...rest } = prevReviews;
+            return rest;
+        }
+    });
+  };
+
   const getReviewsForProduct = useCallback((productId: number): Review[] => {
     return reviews[productId] || [];
   }, [reviews]);
@@ -71,6 +107,8 @@ export const ReviewsProvider: React.FC<{ children: ReactNode }> = ({ children })
   const value = {
     reviews,
     addReview,
+    updateReview,
+    deleteReview,
     getReviewsForProduct,
     getAverageRating,
   };

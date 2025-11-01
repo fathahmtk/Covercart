@@ -1,6 +1,7 @@
 
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { CATEGORIES, SORT_OPTIONS } from '../constants';
+import { SORT_OPTIONS } from '../constants';
 import ProductCard from './ProductCard';
 import { Product } from '../types';
 import ProductFilters from './ProductFilters';
@@ -138,7 +139,6 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, onProductClick, 
             </p>
 
             <ProductFilters
-              categories={CATEGORIES}
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
               priceRange={priceRange}

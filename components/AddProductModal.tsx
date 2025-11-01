@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { Product, ProductVariant } from '../types';
-import { CATEGORIES } from '../constants';
 import { fileToBase64 } from '../utils/imageUtils';
 import { XMarkIcon } from './icons/XMarkIcon';
 import { PhotographIcon } from './icons/PhotographIcon';
 import { XCircleIcon } from './icons/XCircleIcon';
 import { PlusIcon } from './icons/PlusIcon';
+import { useCategory } from '../context/CategoryContext';
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -18,12 +18,13 @@ interface AddProductModalProps {
 
 const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, productToEdit }) => {
   const { addProduct, updateProduct } = useProducts();
+  const { categories } = useCategory();
   
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState(CATEGORIES[1]);
+  const [category, setCategory] = useState(categories[0] || '');
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [variants, setVariants] = useState<Partial<ProductVariant>[]>([]);
   const [isFeatured, setIsFeatured] = useState(false);
@@ -44,12 +45,18 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
     }
   }, [productToEdit, isOpen]);
 
+  useEffect(() => {
+    if (!productToEdit && categories.length > 0) {
+      setCategory(categories[0]);
+    }
+  }, [productToEdit, categories]);
+
   const resetForm = () => {
     setName('');
     setPrice('');
     setStock('');
     setDescription('');
-    setCategory(CATEGORIES[1]);
+    setCategory(categories[0] || '');
     setMainImage(null);
     setVariants([]);
     setIsFeatured(false);
@@ -181,7 +188,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, prod
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
                 <select id="category" value={category} onChange={e => setCategory(e.target.value)} className="mt-1 input-style">
-                  {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
+                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               {variants.length === 0 && (

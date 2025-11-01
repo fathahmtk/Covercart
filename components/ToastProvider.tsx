@@ -27,8 +27,11 @@ interface Toast {
   type: ToastType;
 }
 
+// FIX: Expanded ToastContextType to include toasts and removeToast for type safety.
 interface ToastContextType {
   showToast: (message: string, type?: ToastType) => void;
+  toasts: Toast[];
+  removeToast: (id: number) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -80,7 +83,14 @@ const ToastNotification: React.FC<{ toast: Toast; onRemove: (id: number) => void
 
 
 export const ToastContainer: React.FC = () => {
-    const { toasts, removeToast } = useContext(ToastContext as any);
+    // FIX: Replaced unsafe `useContext(ToastContext as any)` with a type-safe context consumer.
+    const context = useContext(ToastContext);
+
+    if (!context) {
+        return null;
+    }
+    const { toasts, removeToast } = context;
+
     return (
         <>
             <div className="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end z-[9999]">

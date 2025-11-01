@@ -9,6 +9,25 @@ import LazyImage from './LazyImage';
 type PhoneModel = 'iPhone 15 Pro' | 'Galaxy S24' | 'Pixel 8 Pro' | 'Generic';
 const phoneModels: PhoneModel[] = ['iPhone 15 Pro', 'Galaxy S24', 'Pixel 8 Pro', 'Generic'];
 
+const sampleDesigns = [
+  {
+    prompt: "A majestic lion wearing sunglasses in a synthwave style",
+    imageUrl: "https://images.unsplash.com/photo-1627843563937-2965cb2a15d0?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    prompt: "Bioluminescent mushrooms in a magical forest at night, glowing neon blue and purple",
+    imageUrl: "https://images.unsplash.com/photo-1622737133809-d95047b9e673?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    prompt: "A golden retriever wearing a tiny crown, painted in a watercolor style",
+    imageUrl: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    prompt: "Sleek, minimalist wave pattern in black and white",
+    imageUrl: "https://images.unsplash.com/photo-1599238388149-51a4a5892520?q=80&w=800&auto=format&fit=crop"
+  }
+];
+
 const AiDesigner: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -33,6 +52,14 @@ const AiDesigner: React.FC = () => {
       setIsLoading(false);
     }
   };
+  
+  const handleSampleClick = (sample: typeof sampleDesigns[0]) => {
+    setPrompt(sample.prompt);
+    setGeneratedImage(sample.imageUrl);
+    setError(null);
+    setIsLoading(false);
+  };
+
 
   const PhoneFrame: React.FC<{ model: PhoneModel; children: React.ReactNode }> = ({ model, children }) => {
     // Base classes for the phone's outer chassis
@@ -131,6 +158,22 @@ const AiDesigner: React.FC = () => {
                   onChange={(e) => setPrompt(e.target.value)}
                   aria-label="Enter your design idea for AI generation"
                 />
+                 <div className="mt-4">
+                  <p className="text-sm font-semibold text-[--color-text-muted] mb-2">Or try a sample:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {sampleDesigns.map((sample, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSampleClick(sample)}
+                        className="rounded-lg overflow-hidden w-16 h-16 border-2 border-transparent hover:border-[--color-primary] focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary] transition"
+                        title={sample.prompt}
+                        aria-label={`Select sample design: ${sample.prompt}`}
+                      >
+                        <LazyImage src={sample.imageUrl} alt={sample.prompt} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 <div className="mt-6">
                     <label className="block text-lg font-semibold mb-3 text-[--color-text]">

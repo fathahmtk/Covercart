@@ -13,13 +13,18 @@ import { ArrowUpIcon } from '../icons/ArrowUpIcon';
 import { ArrowDownIcon } from '../icons/ArrowDownIcon';
 import { ArchiveBoxIcon } from '../icons/ArchiveBoxIcon';
 import { ClipboardListIcon } from '../icons/ClipboardListIcon';
-import { CATEGORIES } from '../../constants';
+import { useCategory } from '../../context/CategoryContext';
 import LazyImage from '../LazyImage';
 import HeroImageManager from './HeroImageManager';
 import { PaintBrushIcon } from '../icons/PaintBrushIcon';
+import ReviewManager from './ReviewManager';
+import CategoryManager from './CategoryManager';
+import { ChatBubbleBottomCenterTextIcon } from '../icons/ChatBubbleBottomCenterTextIcon';
+import { TagIcon } from '../icons/TagIcon';
 
 type SortConfig<T> = { key: keyof T; direction: 'asc' | 'desc' } | null;
 type ProductSortKeys = 'name' | 'category' | 'price' | 'stock';
+type AdminTab = 'products' | 'orders' | 'appearance' | 'reviews' | 'categories';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -29,7 +34,7 @@ const AdminPanel: React.FC = () => {
   const [password, setPassword] = useState('');
 
   // UI State
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'appearance'>('products');
+  const [activeTab, setActiveTab] = useState<AdminTab>('products');
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   // Products State
@@ -39,7 +44,8 @@ const AdminPanel: React.FC = () => {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   
-  // New states for filtering, sorting, and pagination
+  const { categories } = useCategory();
+  const allCategoriesForFilter = ['All', ...categories];
   const [productSortConfig, setProductSortConfig] = useState<SortConfig<Product> | { key: ProductSortKeys; direction: 'asc' | 'desc' } | null>(null);
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [stockFilter, setStockFilter] = useState('All');
@@ -58,8 +64,8 @@ const AdminPanel: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Replaced hardcoded password with environment variable
-    if (password === process.env.ADMIN_PASSWORD) {
+    // For production, ensure the ADMIN_PASSWORD env var is set and not empty
+    if (process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD) {
       sessionStorage.setItem('isAdminAuthenticated', 'true');
       setIsAuth(true);
     } else {
@@ -205,15 +211,22 @@ const AdminPanel: React.FC = () => {
            <button onClick={() => setActiveTab('appearance')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'appearance' ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
             <PaintBrushIcon /> Appearance
           </button>
+           <button onClick={() => setActiveTab('reviews')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'reviews' ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+            <ChatBubbleBottomCenterTextIcon /> Reviews
+          </button>
+           <button onClick={() => setActiveTab('categories')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'categories' ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+            <TagIcon /> Categories
+          </button>
         </nav>
       </div>
       
       {activeTab === 'products' && (
+        <>
         <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg flex flex-wrap items-center gap-4">
             <div className="flex-grow">
                 <label htmlFor="category-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
                 <select id="category-filter" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600">
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    {allCategoriesForFilter.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
             </div>
             <div className="flex-grow">
@@ -226,18 +239,7 @@ const AdminPanel: React.FC = () => {
                 </select>
             </div>
         </div>
-      )}
-
-      {activeTab === 'appearance' && (
-        <HeroImageManager />
-      )}
-
-
-      {/* Content */}
-      {activeTab !== 'appearance' && (
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-x-auto border dark:border-gray-700">
-            {activeTab === 'products' ? (
-            <>
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -294,8 +296,12 @@ const AdminPanel: React.FC = () => {
                     </div>
                 </div>
             )}
-            </>
-            ) : (
+        </div>
+        </>
+      )}
+      
+      {activeTab === 'orders' && (
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-x-auto border dark:border-gray-700">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -339,9 +345,12 @@ const AdminPanel: React.FC = () => {
                     ))}
                 </tbody>
             </table>
-            )}
         </div>
       )}
+      
+      {activeTab === 'appearance' && <HeroImageManager />}
+      {activeTab === 'reviews' && <ReviewManager />}
+      {activeTab === 'categories' && <CategoryManager />}
       
       <AddProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} productToEdit={productToEdit} />
       <ConfirmationModal isOpen={isConfirmModalOpen} onClose={() => setIsConfirmModalOpen(false)} onConfirm={handleConfirmDelete} title="Delete Product" message={`Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`} confirmButtonText="Delete" confirmButtonVariant="danger" />

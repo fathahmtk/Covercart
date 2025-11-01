@@ -50,7 +50,7 @@ export const MOCK_PRODUCTS: Product[] = [
     { id: 12, name: 'Zen Garden Case for iPhone 14 Pro Max', price: 499, description: 'A minimalist Japanese-inspired design featuring sand ripples and a single stone. A peaceful case for your Apple iPhone.', imageUrl: 'https://images.unsplash.com/photo-1541293361036-85a0354d1ab1?q=80&w=800&auto=format&fit=crop', category: 'Apple', brand: 'Apple', stock: 40, isFeatured: true },
 ];
 
-export const CATEGORIES = ['All', 'Apple', 'Samsung', 'Google', 'OnePlus', 'Xiaomi'];
+export const DEFAULT_CATEGORIES = ['All', 'Apple', 'Samsung', 'Google', 'OnePlus', 'Xiaomi'];
 
 export const SORT_OPTIONS = [
   { value: 'featured', label: 'Featured' },

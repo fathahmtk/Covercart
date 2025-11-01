@@ -11,25 +11,6 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
   const whatsappUrl = `https://wa.me/${BUSINESS_INFO.phone.replace(/\D/g, '')}?text=${encodeURIComponent(BUSINESS_INFO.whatsappMessage)}`;
 
-
-  const handleClearCache = () => {
-    const isConfirmed = window.confirm(
-      'Are you sure you want to clear all app data? This will remove all products, reviews, cart, and wishlist items from your local storage. This action cannot be undone.'
-    );
-    if (isConfirmed) {
-      localStorage.removeItem('covercove-reviews');
-      localStorage.removeItem('covercove-products');
-      localStorage.removeItem('covercove-cart');
-      localStorage.removeItem('covercove-wishlist');
-      localStorage.removeItem('covercove-user-gallery');
-      localStorage.removeItem('covercove-orders');
-      sessionStorage.removeItem('isAdminAuthenticated');
-
-      alert('Application cache has been cleared. The page will now reload.');
-      window.location.reload();
-    }
-  };
-
   return (
     <footer className="bg-gray-800 dark:bg-slate-900 text-gray-300">
       <div className="container mx-auto px-6 py-12">
@@ -96,9 +77,6 @@ const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-gray-700 text-center text-sm text-gray-400">
           <p>&copy; {currentYear} {BUSINESS_INFO.name}. All Rights Reserved.</p>
-           <button onClick={handleClearCache} className="mt-4 text-xs text-gray-500 hover:text-gray-300 hover:underline">
-             Clear Application Cache
-           </button>
         </div>
       </div>
     </footer>
